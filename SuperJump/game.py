@@ -18,10 +18,12 @@ class Game():
         self.p = 0
 
         # self.bg_music =
+
+        #
+        self.imgnum = -1
         self.bg_imgs = []
         for i in range(NUM_BG_IMGS):
             self.bg_imgs.append(loadImage(PATH + "/images/bg" + str(i) + ".png"))
-            print(PATH)
 
         self.platforms = []
 
@@ -32,13 +34,19 @@ class Game():
             # self.platforms.append(Platform())
 
 
-    def decide_bg_imgs(self):
+    def new_phase(self):
         # calculate phase
         phase = self.p // RESX
 
         # calculate bg_img to display
         imgnum = phase // NUM_IMG_DIV
-        imgpart = phase % NUM_IMG_DIV
+        if imgnum > self.imgnum:
+            # show last img for the exceeded part
+            self.imgnum = min([imgnum, NUM_BG_IMGS - 1])
+            print(self.imgnum)
+            return True
+
+        # imgpart = phase % NUM_IMG_DIV
         # imgpart
         # +---------------+
         # | {NUM_IMG_DIV} |
@@ -50,16 +58,27 @@ class Game():
         # |  0            |
         # +---------------+
 
-        return(imgnum, imgpart)
+        return False
 
     def display(self):
 
         # find bg_imgs by the position of the king
-        imgnum, imgpart = Game.decide_bg_imgs(self)
-        
+        new_phase = Game.new_phase(self):
+
+        # imgnum, imgpart = Game.decide_bg_imgs(self)
+
         # display back ground images (at the very back)
-        img = self.bg_imgs[imgnum]
-        
-        imgstart = (img.height / NUM_IMG_DIV) * (NUM_IMG_DIV -1 - imgpart)
-        imgend = imgstart + (img.height / NUM_IMG_DIV)
-        image(img, 0, 0, width, height, 0, imgstart, img.width, imgend)
+        img = self.bg_imgs[self.imgnum]
+
+        # imgstart = (img.height / NUM_IMG_DIV) * (NUM_IMG_DIV -1 - imgpart)
+        # imgend = imgstart + (img.height / NUM_IMG_DIV)
+        # image(img, 0, 0, width, height, 0, imgstart, img.width, imgend)
+        image(img, 0, 0, width, height)
+
+        # display king (for now circle)
+        fill(255)
+        circle(100, RESY - self.p % RESX, 20)
+
+        # create random platforms
+        if new_phase:
+            
