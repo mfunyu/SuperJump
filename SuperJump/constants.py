@@ -7,10 +7,12 @@ import os
 
 RESX = 900
 RESY = 600
-
+KING_SIZE = RESY / 8
 
 
 PATH = os.getcwd()
 
-NUM_BG_IMGS = 1
-NUM_IMG_DIV = 2
+
+NUM_BG_IMGS = 5
+NUM_IMG_DIV = 1
+NUM_PHASE = 1

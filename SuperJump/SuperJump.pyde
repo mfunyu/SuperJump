@@ -9,14 +9,23 @@ game = Game()
 def setup():
     size(RESX, RESY)
     background(0)
+    game.startup()
 
 def draw():
-    background(0)
-    game.display()
-    
+    if game.play:
+        game.display()
 
 def keyPressed():
     global game
-    
+
     if keyCode == UP:
-        game.p += 40
+        game.tmp += 40
+    if keyCode == RETURN:
+        game.play = True
+        
+def mouseClicked():
+    global game
+            
+    game.play = True
+    
+        
