@@ -6,12 +6,14 @@ Main class Game to control all games
 from constants import *
 
 import random
+import time
 
 
 class Game():
     highest_score = 0
 
     def __init__(self):
+        self.time = time.time()
         self.score = 0
         self.gravity = 0
         self.play = False
@@ -54,7 +56,6 @@ class Game():
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
 
-
     def gameover(self):
         '''
         Display the game over screen
@@ -75,7 +76,6 @@ class Game():
         img = loadImage(PATH + "/images/king7.png")
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
-
 
     def create_platforms(self):
         '''
@@ -136,13 +136,13 @@ class Game():
         3. display platform (call .display())
         4. display life left
         5. display king (call .display())
+        6. display the game time
         '''
 
         # 0. if the game is over
-        if 1 == 1 or not self.king.live:
-            self.gameover()
-            return
-
+        # if not self.king.live:
+        #     self.gameover()
+        #     return
 
         # 1. display the background
         # check if the bg_img changed
@@ -173,11 +173,19 @@ class Game():
         # for life in king.life:
         for i in range(3):
             heart = loadImage(PATH + "/images/heart.png")
-            image(heart, GAMEX_R + (GAMEX_L * 0.2), yposition, GAMEX_L * 0.6, GAMEX_L * 0.6)
+            image(heart, GAMEX_R + (GAMEX_L * 0.2), yposition, GAMEX_L * 0.6,
+                  GAMEX_L * 0.6)
             yposition += GAMEX_L
 
         # 5. display king (just a imgage for now)
         # self.king.diplay()
         img = loadImage(PATH + "/images/king0.png")
-        image(img, 20, RESY - self.tmp %
-              RESX, KING_SIZE, KING_SIZE, 0, 0, img.width, img.height)
+        image(img, 20, RESY - self.tmp % RESX, KING_SIZE, KING_SIZE, 0, 0,
+              img.width, img.height)
+
+        # 6. display the game time
+        time_passed = floor(time.time() - self.time)
+        minutes = '0' + str(time_passed // 60)
+        seconds = '0' + str(time_passed % 60)
+        textAlign(LEFT, TOP)
+        text(minutes[-2:] + ":" + seconds[-2:], 10, 10)
