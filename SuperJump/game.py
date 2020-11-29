@@ -4,7 +4,7 @@ Main class Game to control all games
 """
 
 from constants import *
-
+from Creature import *
 import random
 import time
 
@@ -17,8 +17,8 @@ class Game():
         self.score = 0
         self.gravity = 0
         self.play = False
-
-        # self.king = King(RESX / 2, RESY + (KING_SIZE / 2), )
+        # image mode Center
+        self.king = King(RESX / 2, RESY - 30, 3, 30, RESY - 30, 12, PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
         # termporal variable for king
         self.tmp = 0
 
@@ -115,7 +115,7 @@ class Game():
         Return if the bg_img has changed
         '''
         # calculate bg_img to display
-        imgnum = self.tmp // RESX
+        imgnum = self.king.x_position // RESX
 
         # show the last img for the exceeded part
         self.imgnum = min([imgnum, NUM_BG_IMGS - 1])
@@ -178,13 +178,13 @@ class Game():
             yposition += GAMEX_L
 
         # 5. display king (just a imgage for now)
-        # self.king.diplay()
-        img = loadImage(PATH + "/images/king0.png")
-        image(img, 20, RESY - self.tmp % RESX, KING_SIZE, KING_SIZE, 0, 0,
-              img.width, img.height)
+        self.king.display()
+        # img = loadImage(PATH + "/images/king0.png")
+        # image(img, 20, RESY - self.tmp % RESX, KING_SIZE, KING_SIZE, 0, 0,
+            #   img.width, img.height)
 
         # 6. display the game time
-        time_passed = floor(time.time() - self.time)
+        time_passed = int(floor(time.time() - self.time))
         minutes = '0' + str(time_passed // 60)
         seconds = '0' + str(time_passed % 60)
         textAlign(LEFT, TOP)

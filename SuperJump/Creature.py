@@ -48,30 +48,32 @@ class King():
             
         # if calDistance(self, target) <= (self.radius + target.radius):
     
+        # when its in the air (cant jump)
         if self.y_position < self.ground:
             self.canJump = False
             self.frames = 0
+        # king sinks in the platform (set it to on the ground)
         elif self.y_position > self.ground:
             self.y_position = self.ground
             self.canJump = True
         else:
             self.canJump = True
-
         
-
-    
+        # right left movements
         if self.key_handler['right']:
             self.img = self.rightMove_img
             self.x_position += self.speed
-            self.ground = newGround
+            # self.ground = newGround
         elif self.key_handler['left']:
             self.img = self.leftMove_img
             self.x_position -= self.speed
-            self.ground = newGround
+            # self.ground = newGround
         
+        # calc jump height
         if self.key_handler['jump']:
             if self.height < MAXHEIGHT:
-                self.height += 5
+                self.height += 10
+            # displaying the charge bar
             fill(150)
             rectWidth = (self.radius * 2) * self.height / MAXHEIGHT
             rect(self.x_position - self.radius, self.y_position - self.radius - 20, self.radius * 2, 5)
@@ -94,12 +96,12 @@ class King():
         # Displaying the image by width and height of its radius
         imageMode(CENTER)
         image(self.img, self.x_position, self.y_position, 2 * self.radius, 2 * self.radius)
-        
+        imageMode(CORNER)
         
     
     def jump(self):
         
-        radPerFrame = 2*pi/40 # radian per frame
+        radPerFrame = 2*pi/frameRate # radian per frame
         global counter        # framecount while jumping
         
         if self.canJump and self.isJumping:
