@@ -1,8 +1,8 @@
 from math import *
-
+from constants import *
 
 counter = 1
-MAXHEIGHT = 500
+MAXHEIGHT = RESY / 2
 
 class King():
     def __init__(self, x_position, y_position, life, radius, ground, speed, imgName, rightMove_img, leftMove_img, jump_img):
@@ -52,10 +52,6 @@ class King():
         if self.y_position < self.ground:
             self.canJump = False
             self.frames = 0
-        # king sinks in the platform (set it to on the ground)
-        elif self.y_position > self.ground:
-            self.y_position = self.ground
-            self.canJump = True
         else:
             self.canJump = True
         
@@ -74,11 +70,14 @@ class King():
             if self.height < MAXHEIGHT:
                 self.height += 10
             # displaying the charge bar
+            stroke(150)
             fill(150)
-            rectWidth = (self.radius * 2) * self.height / MAXHEIGHT
-            rect(self.x_position - self.radius, self.y_position - self.radius - 20, self.radius * 2, 5)
+            kingwidth = self.radius * 1.8
+            rectWidth = kingwidth * self.height / MAXHEIGHT
+            rect(self.x_position - self.radius, self.y_position - self.radius*1.3, kingwidth, self.radius*0.08)
             fill(255)
-            rect(self.x_position - self.radius, self.y_position - self.radius - 20, rectWidth, 5)
+            stroke(255)
+            rect(self.x_position - self.radius, self.y_position - self.radius*1.3, rectWidth, self.radius*0.08)
             noFill()
         
         if self.isJumping:
@@ -112,3 +111,6 @@ class King():
             self.y_position = - self.height * sin(radPerFrame*counter) + self.ground
             counter += 1
             self.isJumping = True
+        # prevent king from sinking 
+        if self.y_position > self.ground:
+            self.y_position = self.ground

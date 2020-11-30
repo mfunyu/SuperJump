@@ -18,7 +18,7 @@ class Game():
         self.gravity = 0
         self.play = False
         # image mode Center
-        self.king = King(RESX / 2, RESY - 30, 3, 30, RESY - 30, 12, PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
+        self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
         # termporal variable for king
         self.tmp = 0
 
@@ -35,12 +35,13 @@ class Game():
 
         # platform creations
         self.platforms = []
-        Game.create_platforms(self)
+        # Game.create_platforms(self)
 
     def startup(self):
         '''
         Display the startup screen
         '''
+
         image(loadImage(PATH + "/images/bg0.png"), 0, 0, width, height)
         imageMode(CENTER)
         logo = loadImage(PATH + "/images/logo.png")
@@ -77,37 +78,6 @@ class Game():
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
 
-    def create_platforms(self):
-        '''
-        Create a new set of platforms
-        '''
-
-        # set distance in relation to the last board
-        last_distance = 0
-        if self.platforms:
-            last_distance = self.platforms.pop().y_position
-        distance = JUMP_HIGHET - last_distance
-
-        # append platform instance anonimously
-        last_y = 0
-        while last_y > JUMP_HIGHET:
-            # choose x position of the platform
-            # might be too far to jump on
-            center_x = random.randint(GAMEX_L, GAMEX_R)
-
-            # choose y position of the platform
-            # upper_bound: king should be visible in all sceans
-            upper_bound = max([last_y - distance, KING_SIZE])
-            # lower_bound: platform should be higher than the last one
-            lower_bound = last_y
-            center_y = random.randint(upper_bound, lower_bound)
-
-            # instanciate Platform(x, y)
-            self.platforms.append(Platform(center_x, center_y))
-
-            # update variables
-            last_y = center_y
-            distance = JUMP_HEIGHT
 
     def new_phase(self):
         '''
@@ -140,9 +110,9 @@ class Game():
         '''
 
         # 0. if the game is over
-        # if not self.king.live:
-        #     self.gameover()
-        #     return
+        if not self.king.alive:
+            self.gameover()
+            return
 
         # 1. display the background
         # check if the bg_img changed
@@ -170,8 +140,7 @@ class Game():
 
         # 4. display life left
         yposition = GAMEX_L * 0.5
-        # for life in king.life:
-        for i in range(3):
+        for life in range(self.king.life):
             heart = loadImage(PATH + "/images/heart.png")
             image(heart, GAMEX_R + (GAMEX_L * 0.2), yposition, GAMEX_L * 0.6,
                   GAMEX_L * 0.6)
@@ -179,9 +148,6 @@ class Game():
 
         # 5. display king (just a imgage for now)
         self.king.display()
-        # img = loadImage(PATH + "/images/king0.png")
-        # image(img, 20, RESY - self.tmp % RESX, KING_SIZE, KING_SIZE, 0, 0,
-            #   img.width, img.height)
 
         # 6. display the game time
         time_passed = int(floor(time.time() - self.time))
