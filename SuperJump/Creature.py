@@ -47,7 +47,7 @@ class King():
         # check from the highers platform
         for p in reversed(platforms):
             # if platform is lower than the king
-            if (self.y_position - self.radius < p.y
+            if (self.y_position + self.radius < p.y - p.h / 2
                     and p.x - p.w / 2 - self.radius <= self.x_position <= p.x + p.w / 2 + self.radius):
                 self.ground = p.y - p.h / 2
                 return

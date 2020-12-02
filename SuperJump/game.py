@@ -33,6 +33,11 @@ class Game():
 
         # platform creations
         Game.createPlatforms(self)
+        
+        # magma
+        self.magma_img = loadImage(PATH + '/images/magma.png')
+        self.magma_height = 0
+        self.magma_speed = 1
 
 
     def startup(self):
@@ -216,3 +221,7 @@ class Game():
         seconds = '0' + str(time_passed % 60)
         textAlign(LEFT, TOP)
         text(minutes[-2:] + ":" + seconds[-2:], 10, 10)
+        
+        # 7. display the magma
+        self.magma_height += self.magma_speed
+        image(self.magma_img, 0, RESY - self.magma_height, RESX, RESY - self.magma_height)
