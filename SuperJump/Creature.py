@@ -54,10 +54,21 @@ class King():
         # if none, the bottom is the ground
         self.ground = RESY
 
+    
+    def reBorn(self):
+        '''
+        Randomly finding the background to reborn
+        '''
+    
+    def loseLife(self):
+        '''
+        Life loosing condition
+        '''
+        return False
+    
+    def update(self, platforms):
 
-    def update(self, loseLife, platforms):
-
-        if loseLife:
+        if self.loseLife():
             self.life -= 1
 
         if self.life != 0:
@@ -122,7 +133,7 @@ class King():
 
     def display(self, platforms):
 
-        self.update(False, platforms)
+        self.update(platforms)
 
         # Displaying the image by width and height of its radius
         imageMode(CENTER)

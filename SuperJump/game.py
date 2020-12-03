@@ -16,7 +16,7 @@ class Game():
     def __init__(self):
         self.time = time.time()
         self.score = 0
-        self.gravity = 0
+        self.speed = 1
         self.play = False
         self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
 
@@ -26,17 +26,19 @@ class Game():
         # back ground image managements
         self.imgnum = -1
         self.phase = -1
-        self.bg_imgs = []
-        for i in range(NUM_BG_IMGS):
-            self.bg_imgs.append(
-                loadImage(PATH + "/images/bg" + str(i) + ".png"))
+        # self.bg_imgs = []
+        # for i in range(NUM_BG_IMGS):
+        #     self.bg_imgs.append(
+        #         loadImage(PATH + "/images/bg" + str(i) + ".png"))
 
+        self.bg_img = loadImage(PATH + "/images/bg_long.png")
+        self.y_position = - (self.bg_img.height - RESY)
         # platform creations
         Game.createPlatforms(self)
-        
+
         # magma
         self.magma_img = loadImage(PATH + '/images/magma.png')
-        self.magma_height = 0
+        self.magma_height = 10
         self.magma_speed = 1
 
 
@@ -164,6 +166,7 @@ class Game():
 
         return False
 
+
     def display(self):
         '''
         0. game over display
@@ -181,11 +184,20 @@ class Game():
             return
 
         # 1. display the background
-        # check if the bg_img changed
-        new_phase = Game.new_phase(self)
-        # display back ground image of the current phase(at the very back)
-        img = self.bg_imgs[self.imgnum]
-        image(img, 0, 0, width, height)
+        self.y_position += self.speed
+        image(self.bg_img, 0, self.y_position, RESX, self.bg_img.height)
+
+        # 3. display platforms
+        # create random platforms
+        # if new_phase:
+        #     Game.createPlatforms()
+        for platform in self.platforms:
+            platform.y += self.speed
+            platform.display()
+
+        # 7. display the magma
+        # self.magma_height += self.magma_speed
+        image(self.magma_img, 0, RESY - self.magma_height, RESX, RESY - self.magma_height)
 
         # 2. displaying side boundries
         bottom = 0
@@ -197,13 +209,6 @@ class Game():
                   GAMEX_L * img.height / img.width)
             bottom += GAMEX_L * img.height / img.width
 
-        # 3. display platforms
-        # create random platforms
-        if new_phase:
-            Game.createPlatforms()
-        for platform in self.platforms:
-          platform.display()
-
         # 4. display life left
         yposition = GAMEX_L * 0.5
         for life in range(self.king.life):
@@ -213,6 +218,7 @@ class Game():
             yposition += GAMEX_L
 
         # 5. display the king
+        self.king.y_position += self.speed
         self.king.display(self.platforms)
 
         # 6. display the game timer
@@ -221,7 +227,3 @@ class Game():
         seconds = '0' + str(time_passed % 60)
         textAlign(LEFT, TOP)
         text(minutes[-2:] + ":" + seconds[-2:], 10, 10)
-        
-        # 7. display the magma
-        self.magma_height += self.magma_speed
-        image(self.magma_img, 0, RESY - self.magma_height, RESX, RESY - self.magma_height)
