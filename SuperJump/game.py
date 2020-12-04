@@ -16,7 +16,7 @@ class Game():
     def __init__(self):
         self.time = time.time()
         self.score = 0
-        self.speed = 1
+        self.speed = 10
         self.play = False
         self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
 
@@ -26,13 +26,12 @@ class Game():
         # back ground image managements
         self.imgnum = -1
         self.phase = -1
-        # self.bg_imgs = []
-        # for i in range(NUM_BG_IMGS):
-        #     self.bg_imgs.append(
-        #         loadImage(PATH + "/images/bg" + str(i) + ".png"))
-
-        self.bg_img = loadImage(PATH + "/images/bg_long.png")
-        self.y_position = - (self.bg_img.height - RESY)
+        self.bg_imgs = []
+        for i in range(NUM_BG_IMGS):
+            self.bg_imgs.append(
+                loadImage(PATH + "/images/bg" + str(i) + ".png"))
+        self.bg_num = 0
+        self.y_position = - (self.bg_imgs[0].height - RESY)
         # platform creations
         Game.createPlatforms(self)
 
@@ -47,7 +46,7 @@ class Game():
         Display the startup screen
         '''
 
-        image(loadImage(PATH + "/images/bg0.png"), 0, 0, width, height)
+        image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
         imageMode(CENTER)
         logo = loadImage(PATH + "/images/logo.png")
         image(logo, width / 2, height * 2 / 5, width * 5 / 6,
@@ -67,7 +66,7 @@ class Game():
         '''
         Display the game over screen
         '''
-        image(loadImage(PATH + "/images/bg0.png"), 0, 0, width, height)
+        image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
         imageMode(CENTER)
         logo = loadImage(PATH + "/images/gameover.png")
         image(logo, width / 2, height * 1 / 5, width * 5 / 6,
@@ -185,7 +184,10 @@ class Game():
 
         # 1. display the background
         self.y_position += self.speed
-        image(self.bg_img, 0, self.y_position, RESX, self.bg_img.height)
+        if self.y_position > 0:
+            self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS])
+            self.y_position = - (self.bg_imgs[self.bg_num].height - RESY)
+        image(self.bg_imgs[self.bg_num], 0, self.y_position, RESX, self.bg_imgs[self.bg_num].height)
 
         # 3. display platforms
         # create random platforms
