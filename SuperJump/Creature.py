@@ -55,21 +55,23 @@ class King():
         self.ground = RESY
 
     
-    def reBorn(self):
-        '''
-        Randomly finding the background to reborn
-        '''
-    
-    def loseLife(self):
-        '''
-        Life loosing condition
-        '''
-        return False
-    
+    def reborn(self, platforms):
+        # platforms = Platforms() <- list of platforms that is displayed in the game now
+        for platform in platforms:
+        
+            if platform.x in range(RESX * 1/3, RESX * 2/3) and platform.y in range(RESX * 1/3, RESX * 2/3):
+                self.x_position = platform.x
+                self.y_position = platform.y - 1/2 * platform.h - self.radius
+                print(platform.h)
+                return
+        else:
+            print("No Platform")
+
     def update(self, platforms):
 
-        if self.loseLife():
+        if self.y_position + self.radius > RESY - MAGMA_H:
             self.life -= 1
+            self.reborn(platforms)
 
         if self.life != 0:
             self.alive = True

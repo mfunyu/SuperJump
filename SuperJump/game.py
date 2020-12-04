@@ -16,7 +16,7 @@ class Game():
     def __init__(self):
         self.time = time.time()
         self.score = 0
-        self.speed = 10
+        self.speed = GAME_SPEED
         self.play = False
         self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
 
@@ -33,12 +33,14 @@ class Game():
         self.bg_num = 0
         self.y_position = - (self.bg_imgs[0].height - RESY)
         # platform creations
-        Game.createPlatforms(self)
+        self.createPlatforms()
 
         # magma
         self.magma_img = loadImage(PATH + '/images/magma.png')
-        self.magma_height = 10
-        self.magma_speed = 1
+
+        # clouds
+        self.cloud_x = 0
+        self.cloud_y = 0
 
 
     def startup(self):
@@ -79,7 +81,7 @@ class Game():
         text("Your Score", width / 2, height * 2 / 5)
         textSize(floor(RESX * 0.03))
         text(str(self.score), width / 2, height * 3 / 5)
-        img = loadImage(PATH + "/images/king7.png")
+        img = loadImage(PATH + "/images/king10.png")
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
 
@@ -177,17 +179,29 @@ class Game():
         6. display the game time
         '''
 
-        # 0. if the game is over
-        if not self.king.alive:
-            self.gameover()
-            return
+#         # 0. if the game is over
+#         if not self.king.alive:
+#             self.gameover()
+#             return
 
         # 1. display the background
         self.y_position += self.speed
+        # change to the new background image
         if self.y_position > 0:
-            self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS])
+            self.platforms = []
+            self.platforms.append(Platform(100,100,50,50))
+            self.createPlatforms()
+            self.king.reborn(self.platforms)
+            self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
             self.y_position = - (self.bg_imgs[self.bg_num].height - RESY)
         image(self.bg_imgs[self.bg_num], 0, self.y_position, RESX, self.bg_imgs[self.bg_num].height)
+
+        # side
+        if self.bg_num == 2:
+            cloud = loadImage(PATH + "/images/clouds.png")
+            self.cloud_y += self.speed
+            self.cloud_x += self.speed * 2
+            image(cloud, self.cloud_x, self.cloud_y, cloud.width / 2, cloud.height / 2)
 
         # 3. display platforms
         # create random platforms
@@ -199,7 +213,7 @@ class Game():
 
         # 7. display the magma
         # self.magma_height += self.magma_speed
-        image(self.magma_img, 0, RESY - self.magma_height, RESX, RESY - self.magma_height)
+        image(self.magma_img, 0, RESY - MAGMA_H, RESX, self.magma_img.height)
 
         # 2. displaying side boundries
         bottom = 0
@@ -225,6 +239,7 @@ class Game():
 
         # 6. display the game timer
         time_passed = int(floor(time.time() - self.time))
+        self.score = time_passed
         minutes = '0' + str(time_passed // 60)
         seconds = '0' + str(time_passed % 60)
         textAlign(LEFT, TOP)
