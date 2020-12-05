@@ -18,8 +18,7 @@ class Game():
         self.score = 0
         self.speed = GAME_SPEED
         self.play = False
-        self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king0.png")
-
+        self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king8.png", PATH + "/images/king7.png")
         # decide a music
         # self.bg_music
 

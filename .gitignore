@@ -2,4 +2,4 @@
 *.properties
 *.autosave
 *.DS_Store
-*/imagesold/*
+*/imagesold*

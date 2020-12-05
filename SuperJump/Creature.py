@@ -5,8 +5,9 @@ from platforms import *
 counter = 1
 MAXHEIGHT = RESY / 2
 
+
 class King():
-    def __init__(self, x_position, y_position, life, radius, ground, speed, normal_img, rightMove_img, leftMove_img, jump_img):
+    def __init__(self, x_position, y_position, life, radius, ground, speed, normal_img, rightMove_img, leftMove_img, jump_img, charging_img):
 
         self.alive = True
 
@@ -22,10 +23,12 @@ class King():
 
         self.rightImgCounter = 0
         self.leftImgCounter = 3
-        self.jumpImgCounter = 0
+        self.jumpImgCounter_right = 8
+        self.jumpImgCounter_left = 16
         self.rightMove_img = loadImage(rightMove_img)
         self.leftMove_img = loadImage(leftMove_img)
         self.jump_img = loadImage(jump_img)
+        self.charging_img = loadImage(charging_img)
         self.normal_img = loadImage(normal_img)
 
         self.key_handler = {'jump':False, 'right':False, 'left':False}
@@ -54,24 +57,23 @@ class King():
         # if none, the bottom is the ground
         self.ground = RESY
 
-    
+
     def reborn(self, platforms):
         # platforms = Platforms() <- list of platforms that is displayed in the game now
         for platform in platforms:
-        
+
             if platform.x in range(RESX * 1/3, RESX * 2/3) and platform.y in range(RESX * 1/3, RESX * 2/3):
                 self.x_position = platform.x
                 self.y_position = platform.y - 1/2 * platform.h - self.radius
-                print(platform.h)
                 return
         else:
             print("No Platform")
 
     def update(self, platforms):
 
-        if self.y_position + self.radius > RESY - MAGMA_H:
-            self.life -= 1
-            self.reborn(platforms)
+        # if self.y_position + self.radius > RESY - MAGMA_H:
+        #     self.life -= 1
+        #     self.reborn(platforms)
 
         if self.life != 0:
             self.alive = True
@@ -88,29 +90,43 @@ class King():
         else:
             self.canJump = True
 
+        # if in the air, up arrow key does not work
+        if self.isJumping:
+            self.key_handler['jump'] == False
+
+
         # right left movements
-        if self.key_handler['right']:
-            self.rightImgCounter += 1
-            self.rightMove_img = loadImage(PATH + '/images/king' + str(self.rightImgCounter) + '.png')
-            self.img = self.rightMove_img
+        if self.key_handler['right'] and not self.key_handler['jump']:
+            if not self.isJumping:
+                self.rightImgCounter += 1
+                self.rightMove_img = loadImage(PATH + '/images/king' + str(self.rightImgCounter) + '.png')
+                self.img = self.rightMove_img
+                if self.rightImgCounter == 3 or not self.key_handler['right']:
+                    self.rightImgCounter = 0
             self.x_position += self.speed
-            if self.rightImgCounter == 3 or not self.key_handler['right']:
-                self.rightImgCounter = 0
-        elif self.key_handler['left']:
-            self.leftImgCounter += 1
-            self.rightMove_img = loadImage(PATH + '/images/king' + str(self.leftImgCounter) + '.png')
-            self.img = self.rightMove_img
+        elif self.key_handler['left'] and not self.key_handler['jump']:
+            if not self.isJumping:
+                self.leftImgCounter += 1
+                self.rightMove_img = loadImage(PATH + '/images/king' + str(self.leftImgCounter) + '.png')
+                self.img = self.rightMove_img
+                if self.leftImgCounter == 6 or not self.key_handler['left']:
+                    self.leftImgCounter = 3
             self.x_position -= self.speed
-            if self.leftImgCounter == 6 or not self.key_handler['left']:
-                self.leftImgCounter = 3
+        elif self.key_handler['jump'] and not self.isJumping:
+            self.img = self.charging_img
         else:
             self.img = self.normal_img
 
+        # movement while jumping
+        if self.isJumping and self.key_handler['right']:
+            self.jump_img = loadImage(PATH + '/images/king' + str(self.jumpImgCounter_right) + '.png')
+        elif self.isJumping and self.key_handler['left']:
+            self.jump_img = loadImage(PATH + '/images/king' + str(self.jumpImgCounter_left) + '.png')
 
         # calc jump height
         if self.key_handler['jump']:
             if self.height < MAXHEIGHT:
-                self.height += 10
+                self.height += 20
             # displaying the charge bar
             stroke(150)
             fill(150)
@@ -122,14 +138,49 @@ class King():
             rect(self.x_position - self.radius, self.y_position - self.radius*1.3, rectWidth, self.radius*0.08)
             noFill()
 
-        if self.isJumping:
+
+
+        # jumping in the air
+        if self.isJumping and self.height != 0 and self.key_handler['right']:
             self.jump()
+            if (self.height != 0
+            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                self.jumpImgCounter_right = 9
+            if self.jumpImgCounter_right < 14:
+                self.jumpImgCounter_right += 1
+            if self.jumpImgCounter_right == 10:
+                self.jumpImgCounter_right = 11
+            self.img = self.jump_img
+        elif self.isJumping and self.height != 0 and self.key_handler['left']:
+            self.jump()
+            if (self.height != 0
+            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                self.jumpImgCounter_left = 17
+            if self.jumpImgCounter_left < 21:
+                self.jumpImgCounter_left += 1
+            self.img = self.jump_img
+        elif self.isJumping and self.height != 0:
+            self.jump()
+            if (self.height != 0
+            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                self.jumpImgCounter_left = 17
+            if self.jumpImgCounter_left < 21:
+                self.jumpImgCounter_left += 1
+            self.img = self.jump_img
+        # right after done charging for jump
         elif not self.key_handler['jump'] and self.height > 0:
+            self.jumpImgCounter_right = 8
+            self.jumpImgCounter_left = 16
             self.img = self.jump_img
             self.jump()
 
+
+
         # updating a ground
-        self.newGround(platforms)
+        # self.newGround(platforms)
 
 
 
@@ -144,14 +195,16 @@ class King():
 
 
     def jump(self):
-
-        radPerFrame = 2*pi/frameRate # radian per frame
+        global radPerFrame
+        radPerFrame = 2*pi/13 # radian per frame
         global counter        # framecount while jumping
 
+        # end of the jump
         if self.canJump and self.isJumping:
             self.isJumping = False
             counter = 1
             self.height = 0
+        # in the air
         elif self.canJump or self.isJumping:
             self.y_position = - self.height * sin(radPerFrame*counter) + self.ground
             counter += 1
