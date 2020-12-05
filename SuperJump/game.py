@@ -32,8 +32,18 @@ class Game():
                 loadImage(PATH + "/images/bg" + str(i) + ".png"))
         self.bg_num = 0
         self.y_position = - (self.bg_imgs[0].height - RESY)
-        # platform creations
-        self.createPlatforms()
+
+        # multiple platform creations
+
+        self.realplatforms = []
+        self.midplatform = [RESX/2, RESY/2, 200, 100]
+        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
+        print("The", self.midplatform)
+        for single_platform in self.realplatforms:
+            print(single_platform.y)
+            if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
+                self.create_one_real_platform()
+
 
         # magma
         self.magma_img = loadImage(PATH + '/images/magma.png')
@@ -41,6 +51,7 @@ class Game():
         # clouds
         self.cloud_x = 0
         self.cloud_y = 0
+
 
 
     def startup(self):
@@ -86,66 +97,29 @@ class Game():
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
 
 
-    def check_new_platform(self, now, prev):
-        '''
-        Just make it working for now,
-        but the logic needs to be improved
-        (more development with Line's logic probably)
-        '''
+    def create_one_real_platform(self):
+        condition = True
 
-        # restrict them inside the game width
-        if (now.x - now.w / 2 < GAMEX_L or now.x + now.w / 2 > GAMEX_R):
-            return False
+        while condition:
+            new_width = random.randint(100, 200)
+            new_height = random.randint(50, 100)
+            new_x_positive = self.midplatform[0] + self.midplatform[2]+ random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX)
+            new_x_negative = self.midplatform[0] - random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX) - new_width
+            new_x = random.choice([new_x_positive, new_x_negative])
+            new_y = self.midplatform[1] - random.uniform(0.5*tanh(self.speed)*JUMP_HIGHET, 0.8*tanh(self.speed)*JUMP_HIGHET) - new_height
 
-        DistanceX = abs(prev.x - now.x)
-        DistanceY = (prev.y - prev.h / 2) - (now.y - now.h / 2)
-        if 0 < DistanceX < RESX / 2 and 0 < DistanceY < RESY / 2:
-            print(now.x, now.y, now.w, now.h)
-            return True
+            if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
+                condition = False
 
-        # level = 1
-        # if (0.3 * tanh(level) * RESX < DistanceX < 0.6 * tanh(level) * RESX
-        #         and 0.3 * tanh(level) * RESX/2 < DistanceX < 0.6 * tanh(level) * RESX/2):
-        #     return True
-        return False
+        print("prevH", self.midplatform[1])
+        print("nowH", new_y + new_height)
 
-
-    def createPlatforms(self):
-        '''
-        Creating a whole set of platform
-        needs improvement in random.randint() as it takes a long time
-        '''
-
-        self.platforms = []
-        prev_y = RESY
-
-        for num in range(5): #question: gap determined on player location or platform location?
-
-            CONDITION_METS = False
-
-            # until it creates a appropriate platform
-            while not CONDITION_METS:
-                # in the game range
-                x = random.randint(GAMEX_L, GAMEX_R)
-                # higher y position than the previous one
-                y = random.randint(prev_y - 100, prev_y)
-                w = random.randint(50, 200)
-                h = random.randint(20, 50)
-                # instantiate Platform class
-                newPlatform = Platform(x, y, w, h)
-
-                # condition check
-                # if the first platform
-                if not self.platforms:
-                    CONDITION_METS = True
-                # else, check with the previous one
-                else:
-                    CONDITION_METS = self.check_new_platform(newPlatform, self.platforms[-1])
-
-            # store the previous y position
-            prev_y = y
-            # append appropriate platform to the platform list
-            self.platforms.append(newPlatform)
+        self.midplatform[0] = new_x
+        self.midplatform[1] = new_y
+        self.midplatform[2] = new_width
+        self.midplatform[3] = new_height
+        print(self.midplatform)
+        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
 
 
     def new_phase(self):
@@ -188,10 +162,15 @@ class Game():
         self.y_position += self.speed
         # change to the new background image
         if self.y_position > 0:
-            self.platforms = []
-            self.platforms.append(Platform(100,100,50,50))
-            self.createPlatforms()
-            self.king.reborn(self.platforms)
+            self.realplatforms = []
+            self.midplatform = [RESX/2, RESY/2, 200, 100]
+            self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
+            print("The", self.midplatform)
+            for single_platform in self.realplatforms:
+                print(single_platform.y)
+                if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
+                    self.create_one_real_platform()
+            self.king.reborn(self.realplatforms)
             self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
             self.y_position = - (self.bg_imgs[self.bg_num].height - RESY)
         image(self.bg_imgs[self.bg_num], 0, self.y_position, RESX, self.bg_imgs[self.bg_num].height)
@@ -207,9 +186,9 @@ class Game():
         # create random platforms
         # if new_phase:
         #     Game.createPlatforms()
-        for platform in self.platforms:
-            platform.y += self.speed
-            platform.display()
+        for single_platform in self.realplatforms:
+            single_platform.y += self.speed
+            single_platform.display()
 
         # 7. display the magma
         # self.magma_height += self.magma_speed
@@ -235,7 +214,7 @@ class Game():
 
         # 5. display the king
         self.king.y_position += self.speed
-        self.king.display(self.platforms)
+        self.king.display(self.realplatforms)
 
         # 6. display the game timer
         time_passed = int(floor(time.time() - self.time))
