@@ -124,9 +124,9 @@ class Game():
         '''
 
 #         # 0. if the game is over
-        if not self.king.alive:
-            self.gameover()
-            return
+        # if not self.king.alive:
+        #     self.gameover()
+        #     return
 
         # 1. display the background
         self.y_position += self.speed

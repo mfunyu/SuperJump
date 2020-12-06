@@ -6,6 +6,10 @@ from game import Game
 
 player = Minim(this)
 
+unmute = loadImage(PATH + "/images/unmute.png")
+mute = loadImage(PATH + "/images/mute.png")
+speaker = unmute
+
 # instanciate game obj
 bg_musics = {}
 bg_musics['bg_music'] = player.loadFile(PATH + "/sounds/bg_music.mp3")
@@ -21,6 +25,7 @@ def setup():
 def draw():
     if game.play:
         game.display()
+    image(speaker, 10, RESY - 100, 80, 80)
 
 
 def keyPressed():
@@ -43,9 +48,23 @@ def keyReleased():
         game.king.key_handler['right'] = False
     if key == ' ':
         game.king.key_handler['jump'] = False
+        game.play = True
+        
 
 
 def mouseClicked():
     global game
 
     game.play = True
+
+def mousePressed():
+    global bg_musics, speaker
+    if ( 0 <= mouseX <= 100
+        and RESY - 100 <= mouseY <= RESY):
+        for music in bg_musics:
+            if bg_musics[music].isMuted():
+                bg_musics[music].unmute()
+                speaker = unmute
+            else:
+                bg_musics[music].mute()
+                speaker = mute
