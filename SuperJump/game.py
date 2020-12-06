@@ -13,36 +13,31 @@ import time
 class Game():
     highest_score = 0
 
-    def __init__(self):
+    def __init__(self, bg_musics):
         self.time = time.time()
         self.score = 0
         self.speed = GAME_SPEED
         self.play = False
-        self.king = King(RESX / 2, RESY - KING_SIZE/2, 3, KING_SIZE/2, RESY - KING_SIZE/2, 12, PATH + "/images/king0.png", PATH + "/images/king1.png", PATH + "/images/king0.png", PATH + "/images/king8.png", PATH + "/images/king7.png")
         # decide a music
-        # self.bg_music
-
-        # back ground image managements
-        self.imgnum = -1
-        self.phase = -1
+        self.bg_music = bg_musics['bg_music']
+        self.bg_music.loop()
+        # bg_image managements
+        self.bg_num = 0
         self.bg_imgs = []
         for i in range(NUM_BG_IMGS):
-            self.bg_imgs.append(
-                loadImage(PATH + "/images/bg" + str(i) + ".png"))
-        self.bg_num = 0
+            self.bg_imgs.append(loadImage(PATH + "/images/bg" + str(i) + ".png"))
+
         self.y_position = - (self.bg_imgs[0].height - RESY)
 
         # multiple platform creations
-
         self.realplatforms = []
-        self.midplatform = [RESX/2, RESY/2, 200, 100]
+        self.midplatform = [RESX/2, RESY/2, 150, 50]
         self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
-        print("The", self.midplatform)
         for single_platform in self.realplatforms:
-            print(single_platform.y)
             if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
                 self.create_one_real_platform()
 
+        self.king = King(RESX / 2, self.realplatforms[0].y - self.realplatforms[0].h / 2 - KING_SIZE/2, 3, 12, self.realplatforms[0], bg_musics)
 
         # magma
         self.magma_img = loadImage(PATH + '/images/magma.png')
@@ -101,7 +96,7 @@ class Game():
 
         while condition:
             new_width = random.randint(100, 200)
-            new_height = random.randint(50, 100)
+            new_height = random.randint(30, 60)
             new_x_positive = self.midplatform[0] + self.midplatform[2]+ random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX)
             new_x_negative = self.midplatform[0] - random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX) - new_width
             new_x = random.choice([new_x_positive, new_x_negative])
@@ -110,35 +105,11 @@ class Game():
             if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
                 condition = False
 
-        print("prevH", self.midplatform[1])
-        print("nowH", new_y + new_height)
-
         self.midplatform[0] = new_x
         self.midplatform[1] = new_y
         self.midplatform[2] = new_width
         self.midplatform[3] = new_height
-        print(self.midplatform)
         self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
-
-
-    def new_phase(self):
-        '''
-        Calculate a num of bg_img and the phase
-        Return if the bg_img has changed
-        '''
-        # calculate bg_img to display
-        imgnum = self.king.x_position // RESX
-
-        # show the last img for the exceeded part
-        self.imgnum = min([imgnum, NUM_BG_IMGS - 1])
-        # calculate a phase
-        self.phase = self.imgnum // NUM_PHASE
-
-        # if the bg_img needs to be changed
-        if imgnum > self.imgnum:
-            return True
-
-        return False
 
 
     def display(self):
@@ -153,20 +124,18 @@ class Game():
         '''
 
 #         # 0. if the game is over
-#         if not self.king.alive:
-#             self.gameover()
-#             return
+        if not self.king.alive:
+            self.gameover()
+            return
 
         # 1. display the background
         self.y_position += self.speed
         # change to the new background image
         if self.y_position > 0:
             self.realplatforms = []
-            self.midplatform = [RESX/2, RESY/2, 200, 100]
+            self.midplatform = [RESX/2, RESY/2, 150, 50]
             self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
-            print("The", self.midplatform)
             for single_platform in self.realplatforms:
-                print(single_platform.y)
                 if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
                     self.create_one_real_platform()
             self.king.reborn(self.realplatforms)
@@ -183,8 +152,6 @@ class Game():
 
         # 3. display platforms
         # create random platforms
-        # if new_phase:
-        #     Game.createPlatforms()
         for single_platform in self.realplatforms:
             single_platform.y += self.speed
             single_platform.display()
@@ -213,6 +180,7 @@ class Game():
 
         # 5. display the king
         self.king.y_position += self.speed
+        self.king.ground += self.speed
         self.king.display(self.realplatforms)
 
         # 6. display the game timer

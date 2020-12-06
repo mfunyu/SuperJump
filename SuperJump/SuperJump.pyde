@@ -1,10 +1,17 @@
 #import global variables
+add_library('minim')
 from constants import *
 # import class Game
 from game import Game
 
+player = Minim(this)
+
 # instanciate game obj
-game = Game()
+bg_musics = {}
+bg_musics['bg_music'] = player.loadFile(PATH + "/sounds/bg_music.mp3")
+bg_musics['lose_life'] = player.loadFile(PATH + "/sounds/lose_life.mp3")
+
+game = Game(bg_musics)
 
 def setup():
     size(RESX, RESY)
@@ -23,7 +30,7 @@ def keyPressed():
         game.king.key_handler['left'] = True
     elif keyCode == RIGHT:
         game.king.key_handler['right'] = True
-    if keyCode == UP:
+    if key == ' ':
         game.king.key_handler['jump'] = True
 
 
@@ -34,7 +41,7 @@ def keyReleased():
         game.king.key_handler['left'] = False
     elif keyCode == RIGHT:
         game.king.key_handler['right'] = False
-    if keyCode == UP:
+    if key == ' ':
         game.king.key_handler['jump'] = False
 
 
@@ -42,5 +49,3 @@ def mouseClicked():
     global game
 
     game.play = True
-
-

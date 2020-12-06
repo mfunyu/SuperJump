@@ -7,17 +7,20 @@ MAXHEIGHT = RESY / 2
 
 
 class King():
-    def __init__(self, x_position, y_position, life, radius, ground, speed, normal_img, rightMove_img, leftMove_img, jump_img, charging_img):
+    def __init__(self, x_position, y_position, life, speed, realplatform, bg_musics):
 
         self.alive = True
 
+        self.x_position = x_position
+        self.y_position = y_position
         self.life = life
-        self.x_position = RESX / 2
-        self.y_position = RESY - KING_SIZE/2
+        self.bg_musics = bg_musics
         self.radius = KING_SIZE / 2
-        self.ground = RESY
+        self.ground = self.y_position + self.radius
+        self.platform_now = realplatform
         self.speed = speed
-        self.img = loadImage(normal_img)
+        self.y_speed = 0
+        self.jump_start = 0
         self.height = 0
         # self.distance = distance
 
@@ -25,24 +28,23 @@ class King():
         self.leftImgCounter = 3
         self.jumpImgCounter_right = 8
         self.jumpImgCounter_left = 16
-        self.rightMove_img = loadImage(rightMove_img)
-        self.leftMove_img = loadImage(leftMove_img)
-        self.jump_img = loadImage(jump_img)
-        self.charging_img = loadImage(charging_img)
-        self.normal_img = loadImage(normal_img)
+        self.rightMove_img = loadImage(PATH + "/images/king1.png")
+        self.leftMove_img = loadImage(PATH + "/images/king0.png")
+        self.jump_img = loadImage(PATH + "/images/king8.png")
+        self.charging_img = loadImage(PATH + "/images/king7.png")
+        self.normal_img = loadImage(PATH + "/images/king0.png")
+        self.img = self.normal_img
 
         self.key_handler = {'jump':False, 'right':False, 'left':False}
 
-        self.canJump = True
         self.isJumping = False
-        self.frames = 0
 
 
     def calDistance(self, target):
         return ((self.x_position - target.x_position)**2 + (self.y_position - target.y_position)**2)**0.5
 
 
-    def newGround(self, platforms):
+    def groundUpdate(self, platforms):
         '''
         Finding a ground to land on
         Not working for going down
@@ -50,12 +52,15 @@ class King():
         # check from the highers platform
         for p in reversed(platforms):
             # if platform is lower than the king
-            if (self.y_position + self.radius < p.y - p.h / 2
+            if (self.y_position + self.radius <= p.y - p.h / 2
                     and p.x - p.w / 2 - self.radius <= self.x_position <= p.x + p.w / 2 + self.radius):
                 self.ground = p.y - p.h / 2
+                self.platform_now = p
+
                 return
         # if none, the bottom is the ground
-        self.ground = RESY
+        self.y_position = RESY - MAGMA_H - self.radius
+        self.ground = RESY - MAGMA_H
 
 
     def reborn(self, platforms):
@@ -64,31 +69,36 @@ class King():
 
             if platform.x in range(RESX * 1/3, RESX * 2/3) and platform.y in range(RESX * 1/3, RESX * 2/3):
                 self.x_position = platform.x
-                self.y_position = platform.y - 1/2 * platform.h - self.radius
+                self.y_position = platform.y - platform.h / 2 - self.radius
+                self.platform_now = platform
                 return
         else:
             print("No Platform")
 
+
+    def onPlatfrom(self):
+        if self.y_position + self.radius < self.ground:
+            return False
+        # out of x-range in platform
+        if (self.x_position + self.radius / 2 < self.platform_now.x - self.platform_now.w / 2
+                or self.platform_now.x + self.platform_now.w / 2 < self.x_position - self.radius / 2):
+            print("Fall")
+            return False
+        return True
+
     def update(self, platforms):
 
-        # if self.y_position + self.radius > RESY - MAGMA_H:
-        #     self.life -= 1
-        #     self.reborn(platforms)
+        # condition lose life
+        if self.y_position + self.radius > RESY - MAGMA_H:
+            self.life -= 1
+            self.bg_musics["lose_life"].play()
+            self.reborn(platforms)
 
-        if self.life != 0:
-            self.alive = True
-        else:
+        # condition die
+        if self.life <= 0:
             self.alive = False
-            # gameOver()
 
         # if calDistance(self, target) <= (self.radius + target.radius):
-
-        # when its in the air (cant jump)
-        if self.y_position + self.radius < self.ground:
-            self.canJump = False
-            self.frames = 0
-        else:
-            self.canJump = True
 
         # if in the air, up arrow key does not work
         if self.isJumping:
@@ -112,7 +122,7 @@ class King():
                 if self.leftImgCounter == 6 or not self.key_handler['left']:
                     self.leftImgCounter = 3
             self.x_position -= self.speed
-        elif self.key_handler['jump'] and not self.isJumping:
+        elif self.key_handler['jump'] and self.onPlatfrom():
             self.img = self.charging_img
         else:
             self.img = self.normal_img
@@ -124,9 +134,9 @@ class King():
             self.jump_img = loadImage(PATH + '/images/king' + str(self.jumpImgCounter_left) + '.png')
 
         # calc jump height
-        if self.key_handler['jump']:
+        if self.onPlatfrom() and self.key_handler['jump']:
             if self.height < MAXHEIGHT:
-                self.height += 20
+                self.height += 10
             # displaying the charge bar
             stroke(150)
             fill(150)
@@ -144,8 +154,8 @@ class King():
         if self.isJumping and self.height != 0 and self.key_handler['right']:
             self.jump()
             if (self.height != 0
-            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
-            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                    and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+                    and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
                 self.jumpImgCounter_right = 9
             if self.jumpImgCounter_right < 14:
                 self.jumpImgCounter_right += 1
@@ -155,8 +165,8 @@ class King():
         elif self.isJumping and self.height != 0 and self.key_handler['left']:
             self.jump()
             if (self.height != 0
-            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
-            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                    and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+                    and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
                 self.jumpImgCounter_left = 17
             if self.jumpImgCounter_left < 21:
                 self.jumpImgCounter_left += 1
@@ -164,8 +174,8 @@ class King():
         elif self.isJumping and self.height != 0:
             self.jump()
             if (self.height != 0
-            and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
-            and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
+                    and -self.height * sin(radPerFrame*(counter-2)) + self.ground > self.y_position
+                    and self.y_position < -self.height * sin(radPerFrame*counter) + self.ground):
                 self.jumpImgCounter_left = 17
             if self.jumpImgCounter_left < 21:
                 self.jumpImgCounter_left += 1
@@ -177,16 +187,16 @@ class King():
             self.img = self.jump_img
             self.jump()
 
-
-
         # updating a ground
-        # self.newGround(platforms)
-
+        if not self.onPlatfrom():
+            self.groundUpdate(platforms)
 
 
     def display(self, platforms):
 
         self.update(platforms)
+        fill(0,0,255)
+        circle(self.x_position, self.ground, 5)
 
         # Displaying the image by width and height of its radius
         imageMode(CENTER)
@@ -194,21 +204,28 @@ class King():
         imageMode(CORNER)
 
 
+
     def jump(self):
         global radPerFrame
-        radPerFrame = 2*pi/13 # radian per frame
+        radPerFrame = 2*pi/frameRate # radian per frame
         global counter        # framecount while jumping
 
         # end of the jump
-        if self.canJump and self.isJumping:
+        if self.onPlatfrom() and self.isJumping:
             self.isJumping = False
             counter = 1
+            self.y_speed = 0
             self.height = 0
-        # in the air
-        elif self.canJump or self.isJumping:
-            self.y_position = - self.height * sin(radPerFrame*counter) + self.ground
-            counter += 1
+            self.jump_start = 0
+        # in the air or start of the jump
+        elif self.onPlatfrom() or self.isJumping:
+            if not self.jump_start:
+                self.jump_start = self.ground
             self.isJumping = True
+            self.y_position = - self.height * sin(radPerFrame*counter) + self.jump_start
+            self.y_speed = - self.height * cos(radPerFrame*counter)
+            print("sp", self.y_speed)
+            counter += 1
         # prevent king from sinking
         if self.y_position + self.radius > self.ground:
             self.y_position = self.ground - self.radius
