@@ -41,7 +41,7 @@ class King():
         self.isFalling = False
         self.fallImgCounter_right = 9
         self.fallImgCounter_left = 17
-    
+
 
 
     def calDistance(self, target):
@@ -67,11 +67,12 @@ class King():
 
 
     def reborn(self, platforms):
-        # platforms = Platforms() <- list of platforms that is displayed in the game now
+        '''
+        Reborn to the lowerst platform after touching the magma
+        '''
         for platform in platforms:
-
-            if platform.y in range(0 , RESY):
-                print(platform.y)
+            # find the closest platform
+            if 5 < platform.y <= RESY:
                 self.x_position = platform.x
                 self.y_position = platform.y - platform.h / 2 - self.radius
                 self.platform_now = platform
@@ -81,12 +82,14 @@ class King():
 
 
     def onPlatform(self):
+        # if king is in the air
         if self.y_position + self.radius < self.ground:
             return False
 
         # out of x-range in platform
         if (self.x_position + self.radius / 2 < self.platform_now.x - self.platform_now.w / 2
                 or self.platform_now.x + self.platform_now.w / 2 < self.x_position - self.radius / 2):
+            # start falling
             if not self.isJumping:
                 self.isFalling = True
                 global currentFrame
@@ -130,9 +133,9 @@ class King():
         elif self.key_handler['left'] and not self.key_handler['jump']:
             if not self.isJumping:
                 self.leftImgCounter += 1
-                self.rightMove_img = loadImage(PATH + '/images/king' + str(self.leftImgCounter) + '.png')
+                self.leftMove_img = loadImage(PATH + '/images/king' + str(self.leftImgCounter) + '.png')
                 if not self.isFalling and not self.isJumping:
-                    self.img = self.rightMove_img
+                    self.img = self.leftMove_img
                 if self.leftImgCounter == 6 or not self.key_handler['left']:
                     self.leftImgCounter = 3
             self.x_position -= self.speed
@@ -151,7 +154,7 @@ class King():
         # calc jump height
         if self.onPlatform() and self.key_handler['jump']:
             if self.height < MAXHEIGHT:
-                self.height += 10
+                self.height += 17
             # displaying the charge bar
             stroke(150)
             fill(150)
@@ -188,7 +191,7 @@ class King():
             self.jump()
         elif self.isJumping:
             self.jump()
-            
+
         # preventing king from going out of side boundaries
         if self.x_position - self.radius < GAMEX_L:
             self.x_position = GAMEX_L + self.radius
@@ -201,23 +204,6 @@ class King():
 
         if self.isFalling:
             self.fall()
-
-        # create random platforms
-        for single_platform in platforms:
-            
-            # preventing king from going into the platform images
-            # if king is in platform image
-            if (self.y_position - self.radius < single_platform.y + (single_platform.h / 2)
-            and self.y_position - self.radius > single_platform.y - (single_platform.h / 2)
-            and self.x_position + self.radius > single_platform.x - (single_platform.w / 2)
-            and self.x_position - self.radius < single_platform.x + (single_platform.w / 2)):
-                self.isFalling = True
-                self.isJumping = False
-                self.y_speed = 0
-                self.height = 0
-                self.jump_start = 0
-                print(self.y_position, single_platform.y, single_platform.h / 2, self.radius)
-        
 
     def display(self, platforms):
 
@@ -236,10 +222,11 @@ class King():
         # gravity constant speed -> incement
         self.y_speed += 1
         self.y_position += self.y_speed
+        # stop falling
         if self.y_position + self.radius > self.ground:
             self.y_position = self.ground - self.radius
             self.isFalling = False
-        
+            self.y_speed = 0
         if self.key_handler['right']:
             if self.fallImgCounter_right < 11:
                 self.fallImgCounter_right += 1
@@ -288,7 +275,6 @@ class King():
                 self.jump_start = self.ground
             self.isJumping = True
             self.y_position = - self.height * sin(radPerFrame*counter) + self.jump_start
-            print("sp", self.y_speed)
             counter += 1
         # prevent king from sinking
         if self.y_position + self.radius > self.ground:

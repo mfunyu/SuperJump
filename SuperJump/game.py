@@ -17,6 +17,7 @@ class Game():
         self.time = time.time()
         self.score = 0
         self.speed = GAME_SPEED
+        self.speedstore = GAME_SPEED
         self.play = False
         # decide a music
         self.bg_music = bg_musics['bg_music']
@@ -100,7 +101,7 @@ class Game():
             new_x_positive = self.midplatform[0] + self.midplatform[2]+ random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX)
             new_x_negative = self.midplatform[0] - random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX) - new_width
             new_x = random.choice([new_x_positive, new_x_negative])
-            new_y = self.midplatform[1] - random.uniform(0.5*tanh(self.speed)*JUMP_HIGHET, 0.8*tanh(self.speed)*JUMP_HIGHET) - new_height
+            new_y = self.midplatform[1] - random.uniform(2*tanh(self.speed)*JUMP_HIGHET, 3*tanh(self.speed)*JUMP_HIGHET) - new_height
 
             if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
                 condition = False
@@ -132,11 +133,16 @@ class Game():
         self.y_position[0] += self.speed * 0.5
 
         # when the previous image dissapears (only 1 image is displayed)
+        # the previous image sinks below the screen bottom
         if self.y_position[0] > RESY:
             self.y_position[0] = self.y_position[1]
             self.y_position[1] = 0
             self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
+            # increasing the game speed when new bg
+            self.speed += 1
+            self.speedstore += 1
         image(self.bg_imgs[self.bg_num], 0, self.y_position[0], RESX, self.bg_imgs[self.bg_num].height)
+
         # when start displaying clouds (2 images are displayed)
         if -5 <= self.y_position[0] < RESY:
             second_bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
@@ -151,14 +157,12 @@ class Game():
                 for single_platform in self.realplatforms:
                     if single_platform.y >= self.y_position[1]:
                         self.create_one_real_platform()
-            self.y_position[1] += self.speed * 0.5
-            print(self.y_position[1])
             image(self.bg_imgs[second_bg_num], 0, self.y_position[1], RESX, self.bg_imgs[second_bg_num].height)
+            self.y_position[1] += self.speed * 0.5
 
-            # self.king.reborn(self.realplatforms)
 
-        # side
-        if self.bg_num == 2:
+        # side moving clouds
+        if self.bg_num > 1:
             cloud = loadImage(PATH + "/images/clouds.png")
             self.cloud_y += self.speed
             self.cloud_x += self.speed * 2
@@ -196,11 +200,18 @@ class Game():
         self.king.y_position += self.speed
         self.king.ground += self.speed
         self.king.display(self.realplatforms)
+        # when king frames out increase the speed
+        if self.king.y_position - self.king.radius < 20:
+            self.speed += 6
+        # set the speed back to normal
+        else:
+            self.speed = self.speedstore
 
         # 6. display the game timer
         time_passed = int(floor(time.time() - self.time))
         self.score = time_passed
         minutes = '0' + str(time_passed // 60)
         seconds = '0' + str(time_passed % 60)
+        fill(255)
         textAlign(LEFT, TOP)
         text(minutes[-2:] + ":" + seconds[-2:], 10, 10)
