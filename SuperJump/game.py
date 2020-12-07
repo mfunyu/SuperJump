@@ -27,7 +27,7 @@ class Game():
         for i in range(NUM_BG_IMGS):
             self.bg_imgs.append(loadImage(PATH + "/images/bg" + str(i) + ".png"))
 
-        self.y_position = - (self.bg_imgs[0].height - RESY)
+        self.y_position = [- (self.bg_imgs[0].height - RESY), 0]
 
         # multiple platform creations
         self.realplatforms = []
@@ -123,25 +123,39 @@ class Game():
         6. display the game time
         '''
 
-#         # 0. if the game is over
+        # 0. if the game is over
         # if not self.king.alive:
         #     self.gameover()
         #     return
 
         # 1. display the background
-        self.y_position += self.speed
-        # change to the new background image
-        if self.y_position > 0:
-            self.realplatforms = []
-            self.midplatform = [RESX/2, RESY/2, 150, 50]
-            self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
-            for single_platform in self.realplatforms:
-                if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
-                    self.create_one_real_platform()
-            self.king.reborn(self.realplatforms)
+        self.y_position[0] += self.speed * 0.5
+
+        # when the previous image dissapears (only 1 image is displayed)
+        if self.y_position[0] > RESY:
+            self.y_position[0] = self.y_position[1]
+            self.y_position[1] = 0
             self.bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
-            self.y_position = - (self.bg_imgs[self.bg_num].height - RESY)
-        image(self.bg_imgs[self.bg_num], 0, self.y_position, RESX, self.bg_imgs[self.bg_num].height)
+        image(self.bg_imgs[self.bg_num], 0, self.y_position[0], RESX, self.bg_imgs[self.bg_num].height)
+        # when start displaying clouds (2 images are displayed)
+        if -5 <= self.y_position[0] < RESY:
+            second_bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
+            # create second image if not exist
+            if not self.y_position[1]:
+                self.y_position[1] = -1 * (self.bg_imgs[second_bg_num].height)
+                # self.realplatforms = []
+                # self.midplatform = [RESX/2, RESY/2, 150, 50]
+                last = self.realplatforms[-1]
+                self.realplatforms.append(Platform(last.x, last.y, last.w, last.h))
+                # creates list of platforms unitl it reaches the top of the new image
+                for single_platform in self.realplatforms:
+                    if single_platform.y >= self.y_position[1]:
+                        self.create_one_real_platform()
+            self.y_position[1] += self.speed * 0.5
+            print(self.y_position[1])
+            image(self.bg_imgs[second_bg_num], 0, self.y_position[1], RESX, self.bg_imgs[second_bg_num].height)
+
+            # self.king.reborn(self.realplatforms)
 
         # side
         if self.bg_num == 2:

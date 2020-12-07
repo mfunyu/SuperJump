@@ -38,6 +38,7 @@ class King():
         self.key_handler = {'jump':False, 'right':False, 'left':False}
 
         self.isJumping = False
+        self.isFalling = False
         self.fallImgCounter_right = 9
         self.fallImgCounter_left = 17
     
@@ -69,7 +70,8 @@ class King():
         # platforms = Platforms() <- list of platforms that is displayed in the game now
         for platform in platforms:
 
-            if platform.x in range(RESX * 1/3, RESX * 2/3) and platform.y in range(RESX * 1/3, RESX * 2/3):
+            if platform.y in range(0 , RESY):
+                print(platform.y)
                 self.x_position = platform.x
                 self.y_position = platform.y - platform.h / 2 - self.radius
                 self.platform_now = platform
@@ -184,9 +186,14 @@ class King():
             self.jumpImgCounter_left = 16
             self.img = self.jump_img
             self.jump()
-
         elif self.isJumping:
             self.jump()
+            
+        # preventing king from going out of side boundaries
+        if self.x_position - self.radius < GAMEX_L:
+            self.x_position = GAMEX_L + self.radius
+        if self.x_position + self.radius > GAMEX_R:
+            self.x_position = GAMEX_R - self.radius
 
         # updating a ground
         if not self.onPlatform():
@@ -195,6 +202,22 @@ class King():
         if self.isFalling:
             self.fall()
 
+        # create random platforms
+        for single_platform in platforms:
+            
+            # preventing king from going into the platform images
+            # if king is in platform image
+            if (self.y_position - self.radius < single_platform.y + (single_platform.h / 2)
+            and self.y_position - self.radius > single_platform.y - (single_platform.h / 2)
+            and self.x_position + self.radius > single_platform.x - (single_platform.w / 2)
+            and self.x_position - self.radius < single_platform.x + (single_platform.w / 2)):
+                self.isFalling = True
+                self.isJumping = False
+                self.y_speed = 0
+                self.height = 0
+                self.jump_start = 0
+                print(self.y_position, single_platform.y, single_platform.h / 2, self.radius)
+        
 
     def display(self, platforms):
 
