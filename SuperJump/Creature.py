@@ -107,6 +107,7 @@ class King():
             self.isFalling = False
             self.life -= 1
             self.bg_musics["lose_life"].play()
+            self.bg_musics["lose_life"].rewind()
             self.reborn(platforms)
 
         # condition die
@@ -142,8 +143,10 @@ class King():
         elif self.key_handler['jump'] and self.onPlatform():
             # charging sound
             self.img = self.charging_img
+            self.bg_musics["preparing_jump"].play()
         else:
             self.img = self.normal_img
+            self.bg_musics["preparing_jump"].rewind()
 
         # movement while jumping
         if self.isJumping and self.key_handler['right']:
@@ -187,10 +190,14 @@ class King():
         if not self.key_handler['jump'] and self.height > 0:
             self.jumpImgCounter_right = 8
             self.jumpImgCounter_left = 16
+            self.bg_musics["jump"].play()
+            self.bg_musics["jump"].rewind()
             self.img = self.jump_img
             self.jump()
+
         elif self.isJumping:
             self.jump()
+
 
         # preventing king from going out of side boundaries
         if self.x_position - self.radius < GAMEX_L:
@@ -211,10 +218,13 @@ class King():
         fill(0,0,255)
         circle(self.x_position, self.ground, 5)
 
+        print(self.img, self.rightImgCounter, self.leftImgCounter, self.jumpImgCounter_left, self.jumpImgCounter_right)
+
         # Displaying the image by width and height of its radius
         imageMode(CENTER)
         image(self.img, self.x_position, self.y_position, 2 * self.radius, 2 * self.radius)
         imageMode(CORNER)
+
 
 
     def fall(self):
@@ -273,6 +283,8 @@ class King():
         elif self.onPlatform() or self.isJumping:
             if not self.jump_start:
                 self.jump_start = self.ground
+                self.bg_musics["jump"].play()
+                self.bg_musics["jump"].rewind()
             self.isJumping = True
             self.y_position = - self.height * sin(radPerFrame*counter) + self.jump_start
             counter += 1

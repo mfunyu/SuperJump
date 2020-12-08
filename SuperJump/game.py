@@ -21,6 +21,7 @@ class Game():
         self.play = False
         # decide a music
         self.bg_music = bg_musics['bg_music']
+        self.game_end = bg_musics['game_end']
         self.bg_music.loop()
         # bg_image managements
         self.bg_num = 0
@@ -35,7 +36,7 @@ class Game():
         self.midplatform = [RESX/2, RESY/2, 150, 50]
         self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
         for single_platform in self.realplatforms:
-            if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY):
+            if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY) - 1000:
                 self.create_one_real_platform()
 
         self.king = King(RESX / 2, self.realplatforms[0].y - self.realplatforms[0].h / 2 - KING_SIZE/2, 3, 12, self.realplatforms[0], bg_musics)
@@ -74,6 +75,8 @@ class Game():
         '''
         Display the game over screen
         '''
+        self.bg_music.rewind()
+        self.game_end.play()
         image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
         imageMode(CENTER)
         logo = loadImage(PATH + "/images/gameover.png")
@@ -90,6 +93,7 @@ class Game():
         img = loadImage(PATH + "/images/king10.png")
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
+
 
 
     def create_one_real_platform(self):
@@ -155,7 +159,7 @@ class Game():
                 self.realplatforms.append(Platform(last.x, last.y, last.w, last.h))
                 # creates list of platforms unitl it reaches the top of the new image
                 for single_platform in self.realplatforms:
-                    if single_platform.y >= self.y_position[1]:
+                    if single_platform.y >= self.y_position[1] - 1000:
                         self.create_one_real_platform()
             image(self.bg_imgs[second_bg_num], 0, self.y_position[1], RESX, self.bg_imgs[second_bg_num].height)
             self.y_position[1] += self.speed * 0.5

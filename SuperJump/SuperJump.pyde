@@ -3,6 +3,7 @@ add_library('minim')
 from constants import *
 # import class Game
 from game import Game
+import time
 
 player = Minim(this)
 
@@ -13,7 +14,10 @@ speaker = unmute
 # instanciate game obj
 bg_musics = {}
 bg_musics['bg_music'] = player.loadFile(PATH + "/sounds/bg_music.mp3")
+bg_musics['game_end'] = player.loadFile(PATH + "/sounds/game_end.mp3")
+bg_musics['jump'] = player.loadFile(PATH + "/sounds/jump.mp3")
 bg_musics['lose_life'] = player.loadFile(PATH + "/sounds/lose_life.mp3")
+bg_musics['preparing_jump'] = player.loadFile(PATH + "/sounds/preparing_jump.mp3")
 
 game = Game(bg_musics)
 
@@ -48,14 +52,14 @@ def keyReleased():
         game.king.key_handler['right'] = False
     if key == ' ':
         game.king.key_handler['jump'] = False
-        game.play = True
-        
+
 
 
 def mouseClicked():
     global game
-
-    game.play = True
+    if not game.play:
+        game.play = True
+        game.time = time.time()
 
 def mousePressed():
     global bg_musics, speaker
