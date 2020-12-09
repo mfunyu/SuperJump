@@ -112,6 +112,9 @@ class King():
             self.bg_musics["lose_life"].rewind()
             self.reborn(platforms)
 
+        # condition lose life
+
+
         # condition die
         if self.life <= 0:
             self.alive = False
@@ -235,6 +238,9 @@ class King():
         if self.y_position + self.radius > self.ground:
             self.y_position = self.ground - self.radius
             self.isFalling = False
+            if self.platform_now.mark == 1:
+                self.platform_now.mark = 0
+                self.life += 1
             self.y_speed = 0
         if self.key_handler['right']:
             if self.fallImgCounter_right < 11:

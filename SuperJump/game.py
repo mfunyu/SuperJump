@@ -35,7 +35,7 @@ class Game():
         # multiple platform creations
         self.realplatforms = []
         self.midplatform = [RESX/2, RESY/2, 150, 50]
-        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
+        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3], random.randint(1, 7)))
         for single_platform in self.realplatforms:
             if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY) - 10000:
                 self.create_one_real_platform()
@@ -109,7 +109,7 @@ class Game():
             new_x_negative = self.midplatform[0] - random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX) - new_width
             new_x = random.choice([new_x_positive, new_x_negative])
             new_y = self.midplatform[1] - random.uniform(2*tanh(self.speed)*JUMP_HIGHET, 3*tanh(self.speed)*JUMP_HIGHET) - new_height
-
+    
             if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
                 condition = False
 
@@ -117,7 +117,7 @@ class Game():
         self.midplatform[1] = new_y
         self.midplatform[2] = new_width
         self.midplatform[3] = new_height
-        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
+        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3], random.randint(1, 7)))
 
 
     def display(self):
@@ -159,7 +159,7 @@ class Game():
                 # self.realplatforms = []
                 # self.midplatform = [RESX/2, RESY/2, 150, 50]
                 last = self.realplatforms[-1]
-                self.realplatforms.append(Platform(last.x, last.y, last.w, last.h))
+ 
                 # creates list of platforms unitl it reaches the top of the new image
                 for single_platform in self.realplatforms:
                     if single_platform.y >= self.y_position[1] - 1000:
