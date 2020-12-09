@@ -81,7 +81,7 @@ class King():
             print("No Platform")
 
 
-    def onPlatform(self):
+    def check_onPlatform(self):
         # if king is in the air
         if self.y_position + self.radius < self.ground:
             return False
@@ -101,6 +101,8 @@ class King():
 
 
     def update(self, platforms):
+
+        self.onPlatform = self.check_onPlatform()
 
         # condition lose life
         if self.y_position + self.radius > RESY - MAGMA_H:
@@ -140,13 +142,10 @@ class King():
                 if self.leftImgCounter == 6 or not self.key_handler['left']:
                     self.leftImgCounter = 3
             self.x_position -= self.speed
-        elif self.key_handler['jump'] and self.onPlatform():
-            # charging sound
+        elif self.key_handler['jump'] and self.onPlatform:
             self.img = self.charging_img
-            self.bg_musics["preparing_jump"].play()
         else:
             self.img = self.normal_img
-            self.bg_musics["preparing_jump"].rewind()
 
         # movement while jumping
         if self.isJumping and self.key_handler['right']:
@@ -155,7 +154,11 @@ class King():
             self.jump_img = loadImage(PATH + '/images/king' + str(self.jumpImgCounter_left) + '.png')
 
         # calc jump height
-        if self.onPlatform() and self.key_handler['jump']:
+        if self.onPlatform and self.key_handler['jump']:
+            # charging sound start
+            if not self.height:
+                self.bg_musics["preparing_jump"].rewind()
+                self.bg_musics["preparing_jump"].play()
             if self.height < MAXHEIGHT:
                 self.height += 17
             # displaying the charge bar
@@ -190,8 +193,6 @@ class King():
         if not self.key_handler['jump'] and self.height > 0:
             self.jumpImgCounter_right = 8
             self.jumpImgCounter_left = 16
-            self.bg_musics["jump"].play()
-            self.bg_musics["jump"].rewind()
             self.img = self.jump_img
             self.jump()
 
@@ -206,7 +207,7 @@ class King():
             self.x_position = GAMEX_R - self.radius
 
         # updating a ground
-        if not self.onPlatform():
+        if not self.onPlatform:
             self.groundUpdate(platforms)
 
         if self.isFalling:
@@ -215,10 +216,8 @@ class King():
     def display(self, platforms):
 
         self.update(platforms)
-        fill(0,0,255)
-        circle(self.x_position, self.ground, 5)
 
-        print(self.img, self.rightImgCounter, self.leftImgCounter, self.jumpImgCounter_left, self.jumpImgCounter_right)
+        print(self.img, self.rightImgCounter, self.leftImgCounter, self.jumpImgCounter_left, self.jumpImgCounter_right, self.fallImgCounter_right, self.fallImgCounter_left)
 
         # Displaying the image by width and height of its radius
         imageMode(CENTER)
@@ -255,7 +254,7 @@ class King():
             self.img = loadImage(PATH + "/images/king" + str(self.fallImgCounter_right) + ".png")
             self.img = loadImage(PATH + "/images/king" + str(self.fallImgCounter_left) + ".png")
 
-        if self.onPlatform():
+        if self.onPlatform:
             self.isFalling = False
             self.fallImgCounter_right = 8
             self.fallImgCounter_left = 16
@@ -280,8 +279,9 @@ class King():
             self.height = 0
             self.jump_start = 0
         # in the air or start of the jump
-        elif self.onPlatform() or self.isJumping:
+        elif self.onPlatform or self.isJumping:
             if not self.jump_start:
+                self.bg_musics["preparing_jump"].pause()
                 self.jump_start = self.ground
                 self.bg_musics["jump"].play()
                 self.bg_musics["jump"].rewind()

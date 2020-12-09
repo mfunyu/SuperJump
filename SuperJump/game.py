@@ -20,6 +20,7 @@ class Game():
         self.speedstore = GAME_SPEED
         self.play = False
         # decide a music
+        self.bg_musics = bg_musics
         self.bg_music = bg_musics['bg_music']
         self.game_end = bg_musics['game_end']
         self.bg_music.loop()
@@ -36,7 +37,7 @@ class Game():
         self.midplatform = [RESX/2, RESY/2, 150, 50]
         self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3]))
         for single_platform in self.realplatforms:
-            if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY) - 1000:
+            if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY) - 10000:
                 self.create_one_real_platform()
 
         self.king = King(RESX / 2, self.realplatforms[0].y - self.realplatforms[0].h / 2 - KING_SIZE/2, 3, 12, self.realplatforms[0], bg_musics)
@@ -75,7 +76,9 @@ class Game():
         '''
         Display the game over screen
         '''
-        self.bg_music.rewind()
+        print(self.bg_musics)
+        for bg_music in self.bg_musics:
+            self.bg_musics[bg_music].pause()
         self.game_end.play()
         image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
         imageMode(CENTER)
@@ -129,9 +132,9 @@ class Game():
         '''
 
         # 0. if the game is over
-        # if not self.king.alive:
-        #     self.gameover()
-        #     return
+        if not self.king.alive:
+            self.gameover()
+            return
 
         # 1. display the background
         self.y_position[0] += self.speed * 0.5
