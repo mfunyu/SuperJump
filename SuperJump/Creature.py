@@ -4,7 +4,7 @@ from platforms import *
 
 counter = 1
 MAXHEIGHT = RESY / 2
-currentFrame = 0
+fallstartFrame = 0
 
 class King():
     def __init__(self, x_position, y_position, life, speed, realplatform, bg_musics):
@@ -92,8 +92,8 @@ class King():
             # start falling
             if not self.isJumping:
                 self.isFalling = True
-                global currentFrame
-                currentFrame = frameCount
+                global fallstartFrame
+                fallstartFrame = frameCount
             return False
 
         self.isFalling = False
@@ -163,7 +163,7 @@ class King():
                 self.bg_musics["preparing_jump"].rewind()
                 self.bg_musics["preparing_jump"].play()
             if self.height < MAXHEIGHT:
-                self.height += 17
+                self.height += 30
             # displaying the charge bar
             stroke(150)
             fill(150)
@@ -228,11 +228,13 @@ class King():
         imageMode(CORNER)
 
 
+    # def adjust_image_counter():
+
 
     def fall(self):
 
         # gravity constant speed -> incement
-        self.y_speed += 1
+        self.y_speed += 2
         self.y_position += self.y_speed
         # stop falling
         if self.y_position + self.radius > self.ground:
@@ -248,16 +250,19 @@ class King():
                 self.fallImgCounter_left += 1
             if self.fallImgCounter_right == 10:
                 self.fallImgCounter_right = 11
-            if currentFrame < frameCount - 4:
+            if fallstartFrame > frameCount - 6:
                 self.fallImgCounter_right = 9
+            if self.fallImgCounter_right > 11:
+                self.fallImgCounter_right = 11
             self.img = loadImage(PATH + "/images/king" + str(self.fallImgCounter_right) + ".png")
         elif self.key_handler['left']:
             if self.fallImgCounter_left < 18:
                 self.fallImgCounter_left += 1
                 self.fallImgCounter_right += 1
-            if currentFrame < frameCount - 4:
+            if fallstartFrame > frameCount - 6:
                 self.fallImgCounter_left = 17
-            self.img = loadImage(PATH + "/images/king" + str(self.fallImgCounter_right) + ".png")
+            if self.fallImgCounter_left > 18:
+                self.fallImgCounter_left = 18
             self.img = loadImage(PATH + "/images/king" + str(self.fallImgCounter_left) + ".png")
 
         if self.onPlatform:
@@ -279,6 +284,8 @@ class King():
         # end of the jump
         if self.y_speed > 0 and self.isJumping:
             self.isFalling = True
+            global fallstartFrame
+            fallstartFrame = frameCount
             self.isJumping = False
             counter = 1
             self.y_speed = 0
