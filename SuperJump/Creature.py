@@ -6,6 +6,15 @@ counter = 1
 MAXHEIGHT = RESY / 2
 fallstartFrame = 0
 
+
+class Monster():
+    def __init__(self, x_position, y_position, radius):
+        self.x_position = x_position
+        self.y_position = y_position
+        self.radius = radius
+
+
+
 class King():
     def __init__(self, x_position, y_position, life, speed, realplatform, bg_musics):
 

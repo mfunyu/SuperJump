@@ -11,6 +11,7 @@ class Platform():
         
         self.img0 = loadImage(PATH + "/images/brick0.png")
         self.img1 = loadImage(PATH + "/images/brick1.png")
+        self.img2 = loadImage(PATH + "/images/magma.png")
         self.frame = 0
         self.mark = mark
 
@@ -18,6 +19,8 @@ class Platform():
         imageMode(CENTER)
         if self.mark == 1:
             image(self.img1, self.x, self.y, self.w, self.h)
+        elif self.mark == 2:
+            image(self.img2, self.x, self.y, self.w, self.h)
         else:
             image(self.img0, self.x, self.y, self.w, self.h)
         imageMode(CORNER)
