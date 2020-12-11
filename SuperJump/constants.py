@@ -27,3 +27,8 @@ JUMP_HIGHET = 20
 NUM_BG_IMGS = 5
 NUM_IMG_DIV = 1
 NUM_PHASE = 1
+
+# loading flags
+NOT_STARTED = 1 << 0
+LOADING = 1 << 1
+LOADED = 1 << 2

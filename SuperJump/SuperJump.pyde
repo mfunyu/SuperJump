@@ -19,17 +19,49 @@ bg_musics['jump'] = player.loadFile(PATH + "/sounds/jump.mp3")
 bg_musics['lose_life'] = player.loadFile(PATH + "/sounds/lose_life.mp3")
 bg_musics['preparing_jump'] = player.loadFile(PATH + "/sounds/preparing_jump.mp3")
 
-game = Game(bg_musics)
+load_status = NOT_STARTED
+
+game = ""
+
+def startup(displaytext):
+    '''
+    Display the startup screen
+    '''
+
+    image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
+    imageMode(CENTER)
+    logo = loadImage(PATH + "/images/logo.png")
+    image(logo, width / 2, height * 1 / 3,
+          width * 5 / 6, (width * 5 / 6) * logo.height / logo.width)
+    imageMode(CORNER)
+    fill(255)
+    textAlign(CENTER)
+    font = createFont("3270SemiNarrow", floor(RESX * 0.03))
+    textFont(font)
+    text(displaytext, width / 2, height * 3 / 4)
+    img = loadImage(PATH + "/images/king0.png")
+    image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
+        KING_SIZE * 1.5, 0, 0, img.width, img.height)
 
 def setup():
     size(RESX, RESY)
     background(0)
 
 def draw():
-    if game.play:
+    global load_status, game, bg_musics
+    # need to instantiate game
+    if load_status == NOT_STARTED:
+        # show the image for loading
+        startup("Loading ... ")
+        load_status = LOADING
+    # ready to instanciate game
+    elif load_status == LOADING and not game:
+        game = Game(bg_musics)
+    elif game.play:
         game.display()
     elif game.king.alive:
-        game.startup()
+        startup("Click Anywhere to Start")
+        load_status = LOADED
     else:
         game.gameover()
     image(speaker, 10, RESY - 100, 80, 80)
@@ -58,7 +90,7 @@ def keyReleased():
 
 
 def mousePressed():
-    global game, bg_musics, speaker
+    global game, bg_musics, speaker, load_status
     
     # mute or unmute the music
     if ( 0 <= mouseX <= 100
@@ -71,9 +103,11 @@ def mousePressed():
                 bg_musics[music].mute()
                 speaker = mute
     # start the game
-    elif not game.king.alive:
-        game = Game(bg_musics)
-    elif not game.play:
+    elif load_status == LOADED and not game.king.alive:
+        load_status = NOT_STARTED
+        game = ""
+    elif load_status == LOADED and not game.play:
+        print(load_status)
         game.play = True
         game.time = time.time()
 

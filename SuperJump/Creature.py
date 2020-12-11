@@ -31,6 +31,7 @@ class King():
         self.y_speed = 0
         self.jump_start = 0
         self.height = 0
+        self.score = 0
         # self.distance = distance
 
         self.rightImgCounter = 0
@@ -252,6 +253,7 @@ class King():
             if self.platform_now.mark == 1:
                 self.platform_now.mark = 0
                 self.life += 1
+                self.score += 10
             self.y_speed = 0
         if self.key_handler['right']:
             if self.fallImgCounter_right < 11:

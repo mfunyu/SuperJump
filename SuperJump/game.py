@@ -50,28 +50,6 @@ class Game():
         self.cloud_y = 0
 
 
-
-    def startup(self):
-        '''
-        Display the startup screen
-        '''
-
-        image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
-        imageMode(CENTER)
-        logo = loadImage(PATH + "/images/logo.png")
-        image(logo, width / 2, height * 2 / 5, width * 5 / 6,
-              (width * 5 / 6) * logo.height / logo.width)
-        imageMode(CORNER)
-        fill(255)
-        textAlign(CENTER)
-        font = createFont("3270SemiNarrow", floor(RESX * 0.03))
-        textFont(font)
-        text("Click Anywhere to Start", width / 2, height * 3 / 4)
-        img = loadImage(PATH + "/images/king0.png")
-        image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
-              KING_SIZE * 1.5, 0, 0, img.width, img.height)
-
-
     def gameover(self):
         '''
         Display the game over screen
@@ -92,6 +70,7 @@ class Game():
         text("Your Score", width / 2, height * 2 / 5)
         textSize(floor(RESX * 0.03))
         text(str(self.score), width / 2, height * 3 / 5)
+        text("Click Anywhere to Restart", width / 2, height * 4 / 5)
         img = loadImage(PATH + "/images/king10.png")
         image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
               KING_SIZE * 1.5, 0, 0, img.width, img.height)
@@ -215,9 +194,10 @@ class Game():
 
         # 6. display the game timer
         time_passed = int(floor(time.time() - self.time))
-        self.score = time_passed
+        self.score = time_passed + self.king.score
         minutes = '0' + str(time_passed // 60)
         seconds = '0' + str(time_passed % 60)
         fill(255)
         textAlign(LEFT, TOP)
         text(minutes[-2:] + ":" + seconds[-2:], 10, 10)
+        text("score " + str(self.score), 10, 40)
