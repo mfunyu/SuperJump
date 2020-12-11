@@ -35,7 +35,7 @@ class Game():
         # multiple platform creations
         self.realplatforms = []
         self.midplatform = [RESX/2, RESY/2, 150, 50]
-        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3], random.randint(1, 7)))
+        self.realplatforms.append(Platform(self.midplatform[0], self.midplatform[1], self.midplatform[2], self.midplatform[3], 0))
         for single_platform in self.realplatforms:
             if single_platform.y >= -(self.bg_imgs[self.bg_num].height - RESY) - 10000:
                 self.create_one_real_platform()

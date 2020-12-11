@@ -13,8 +13,6 @@ class Monster():
         self.y_position = y_position
         self.radius = radius
 
-
-
 class King():
     def __init__(self, x_position, y_position, life, speed, realplatform, bg_musics):
 
@@ -55,15 +53,14 @@ class King():
 
 
     def calDistance(self, target):
-        return ((self.x_position - target.x_position)**2 + (self.y_position - target.y_position)**2)**0.5
+        return ((self.x_position - target[0])**2 + (self.y_position - target[1])**2)**0.5
 
 
     def groundUpdate(self, platforms):
         '''
-        Finding a ground to land on
-        Not working for going down
-        '''
-        # check from the highers platform
+        Finding a grounself.d to land on
+        Not working for going d   '''
+        # check frotarget.y_positionhers platform
         for p in reversed(platforms):
             # if platform is lower than the king
             if (self.y_position + self.radius <= p.y - p.h / 2
@@ -82,7 +79,7 @@ class King():
         '''
         for platform in platforms:
             # find the closest platform
-            if 5 < platform.y <= RESY:
+            if 5 < platform.y <= RESY and platform.mark != 1 and platform.mark != 2:
                 self.x_position = platform.x
                 self.y_position = platform.y - platform.h / 2 - self.radius
                 self.platform_now = platform
@@ -113,6 +110,18 @@ class King():
     def update(self, platforms):
 
         self.onPlatform = self.check_onPlatform()
+
+        if self.platform_now.mark == 1:
+            if self.check_onPlatform():
+                self.platform_now.mark = 0
+                self.life += 1
+                self.score += 10
+        elif self.platform_now.mark == 2: #platform is bad
+            if self.check_onPlatform():
+                self.platform_now.mark = 0
+                self.life -= 1
+                self.score -= 10
+
 
         # condition lose life
         if self.y_position + self.radius > RESY - MAGMA_H:
@@ -250,10 +259,6 @@ class King():
         if self.y_position + self.radius > self.ground:
             self.y_position = self.ground - self.radius
             self.isFalling = False
-            if self.platform_now.mark == 1:
-                self.platform_now.mark = 0
-                self.life += 1
-                self.score += 10
             self.y_speed = 0
         if self.key_handler['right']:
             if self.fallImgCounter_right < 11:

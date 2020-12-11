@@ -68,6 +68,9 @@ def draw():
 
 
 def keyPressed():
+    '''
+    Control the king movement by keys: pressed status
+    '''
     global game
 
     if keyCode == LEFT:
@@ -79,6 +82,9 @@ def keyPressed():
 
 
 def keyReleased():
+    '''
+    Control the king movement by keys: releasted status
+    '''
     global game
 
     if keyCode == LEFT:
@@ -90,6 +96,10 @@ def keyReleased():
 
 
 def mousePressed():
+    '''
+    Mute / Unmute or 
+    Start / Restart game
+    '''
     global game, bg_musics, speaker, load_status
     
     # mute or unmute the music
@@ -102,12 +112,14 @@ def mousePressed():
             else:
                 bg_musics[music].mute()
                 speaker = mute
-    # start the game
+    
+    # restart the game
     elif load_status == LOADED and not game.king.alive:
         load_status = NOT_STARTED
         game = ""
+    
+    # star the game
     elif load_status == LOADED and not game.play:
-        print(load_status)
         game.play = True
         game.time = time.time()
 
