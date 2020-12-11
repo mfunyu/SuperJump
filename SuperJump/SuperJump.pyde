@@ -24,11 +24,14 @@ game = Game(bg_musics)
 def setup():
     size(RESX, RESY)
     background(0)
-    game.startup()
 
 def draw():
     if game.play:
         game.display()
+    elif game.king.alive:
+        game.startup()
+    else:
+        game.gameover()
     image(speaker, 10, RESY - 100, 80, 80)
 
 
@@ -54,15 +57,10 @@ def keyReleased():
         game.king.key_handler['jump'] = False
 
 
-
-def mouseClicked():
-    global game
-    if not game.play:
-        game.play = True
-        game.time = time.time()
-
 def mousePressed():
-    global bg_musics, speaker
+    global game, bg_musics, speaker
+    
+    # mute or unmute the music
     if ( 0 <= mouseX <= 100
         and RESY - 100 <= mouseY <= RESY):
         for music in bg_musics:
@@ -72,3 +70,11 @@ def mousePressed():
             else:
                 bg_musics[music].mute()
                 speaker = mute
+    # start the game
+    elif not game.king.alive:
+        game = Game(bg_musics)
+    elif not game.play:
+        game.play = True
+        game.time = time.time()
+
+        

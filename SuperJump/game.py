@@ -76,7 +76,6 @@ class Game():
         '''
         Display the game over screen
         '''
-        print(self.bg_musics)
         for bg_music in self.bg_musics:
             self.bg_musics[bg_music].pause()
         self.game_end.play()
@@ -109,7 +108,7 @@ class Game():
             new_x_negative = self.midplatform[0] - random.uniform(0.3*tanh(self.speed)*HORIZONTAL_MAX, 0.6*tanh(self.speed)*HORIZONTAL_MAX) - new_width
             new_x = random.choice([new_x_positive, new_x_negative])
             new_y = self.midplatform[1] - random.uniform(2*tanh(self.speed)*JUMP_HIGHET, 3*tanh(self.speed)*JUMP_HIGHET) - new_height
-    
+
             if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
                 condition = False
 
@@ -133,7 +132,7 @@ class Game():
 
         # 0. if the game is over
         if not self.king.alive:
-            self.gameover()
+            self.play = False
             return
 
         # 1. display the background
@@ -159,7 +158,7 @@ class Game():
                 # self.realplatforms = []
                 # self.midplatform = [RESX/2, RESY/2, 150, 50]
                 last = self.realplatforms[-1]
- 
+
                 # creates list of platforms unitl it reaches the top of the new image
                 for single_platform in self.realplatforms:
                     if single_platform.y >= self.y_position[1] - 1000:
