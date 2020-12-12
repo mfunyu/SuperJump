@@ -28,18 +28,18 @@ class Platform():
         self.mark = mark
         self.text_display = ""
 
+
     def display(self): #syntax: image(img, x, y, width, height, x1, y1, x2, y2)
         imageMode(CENTER)
         if self.mark == 1:
             image(self.img1, self.x, self.y, self.w, self.h)
         elif self.mark == 2:
             image(self.img2, self.x, self.y, self.w, self.h)
-            image(self.img3, self.x, self.y - self.h/2 - 40, 80, 80)
-
+            image(self.img3, self.x, self.y - self.h/2 - (KING_SIZE / 2), KING_SIZE, KING_SIZE)
         else:
             image(self.img0, self.x, self.y, self.w, self.h)
         imageMode(CORNER)
-        
+
         self.text_display = self.text_display[:-1]
         if len(self.text_display) >= 3:
             text(self.text_display, self.x, self.y)

@@ -137,12 +137,12 @@ class Game():
                 self.y_position[1] = -1 * (self.bg_imgs[second_bg_num].height)
                 # self.realplatforms = []
                 # self.midplatform = [RESX/2, RESY/2, 150, 50]
-                last = self.realplatforms[-1]
+                # last = self.realplatforms[-1]
 
-                # creates list of platforms unitl it reaches the top of the new image
-                for single_platform in self.realplatforms:
-                    if single_platform.y >= self.y_position[1] - 1000:
-                        self.create_one_real_platform()
+                # # creates list of platforms unitl it reaches the top of the new image
+                # for single_platform in self.realplatforms:
+                #     if single_platform.y >= self.y_position[1] - 1000:
+                #         self.create_one_real_platform()
             image(self.bg_imgs[second_bg_num], 0, self.y_position[1], RESX, self.bg_imgs[second_bg_num].height)
             self.y_position[1] += self.speed * 0.5
 

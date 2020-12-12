@@ -7,12 +7,6 @@ MAXHEIGHT = RESY / 2
 fallstartFrame = 0
 
 
-class Monster():
-    def __init__(self, x_position, y_position, radius):
-        self.x_position = x_position
-        self.y_position = y_position
-        self.radius = radius
-
 class King():
     def __init__(self, x_position, y_position, life, speed, realplatform, bg_musics):
 
@@ -53,7 +47,7 @@ class King():
 
 
     def calDistance(self, target):
-        return ((self.x_position - target[0])**2 + (self.y_position - target[1])**2)**0.5
+        return ((self.x_position - target.x)**2 + (self.y_position - (target.y - (target.h / 2) - (KING_SIZE / 2)))**2)**0.5
 
 
     def groundUpdate(self, platforms):
@@ -84,8 +78,7 @@ class King():
                 self.y_position = platform.y - platform.h / 2 - self.radius
                 self.platform_now = platform
                 return
-        else:
-            print("No Platform")
+
 
 
     def check_onPlatform(self):
@@ -110,26 +103,28 @@ class King():
     def update(self, platforms):
 
         self.onPlatform = self.check_onPlatform()
-        
+
         if self.onPlatform:
             # add life and score when landing on a good platform
             if self.platform_now.mark == 1:
                 self.platform_now.mark = 0
                 self.life += 1
                 self.score += 20
-                self.platform_now.text_display = "+20   " 
+                self.platform_now.text_display = "+20   "
             # reduce life and score when landing on a bad platform
             elif self.platform_now.mark == 2: #platform is bad
-                self.platform_now.mark = 0
-                self.life -= 1
-                self.score -= 10
-                self.platform_now.text_display = "-10   "       
+                if self.calDistance(self.platform_now) <= self.radius * 2:
+                    self.bg_musics["lose_life"].play()
+                    self.bg_musics["lose_life"].rewind()
+                    self.platform_now.mark = 0
+                    self.life -= 1
+                    self.score -= 10
+                    self.platform_now.text_display = "-10   "
             # add score when landing on a normal platform
             elif self.platform_now.mark != 0:
                 self.platform_now.mark = 0
                 self.score += 10
                 self.platform_now.text_display = "+10   "
-
 
         # condition lose life
         if self.y_position + self.radius > RESY - MAGMA_H:
@@ -139,14 +134,11 @@ class King():
             self.bg_musics["lose_life"].rewind()
             self.reborn(platforms)
 
-        # condition lose life
-
 
         # condition die
         if self.life <= 0:
             self.alive = False
 
-        # if calDistance(self, target) <= (self.radius + target.radius):
 
         # if in the air, up arrow key does not work
         if self.isJumping:
@@ -247,7 +239,6 @@ class King():
 
         self.update(platforms)
 
-        print(self.img, self.rightImgCounter, self.leftImgCounter, self.jumpImgCounter_left, self.jumpImgCounter_right, self.fallImgCounter_right, self.fallImgCounter_left)
 
         # Displaying the image by width and height of its radius
         imageMode(CENTER)
