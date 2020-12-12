@@ -80,6 +80,7 @@ class Game():
     def create_one_real_platform(self):
         condition = True
 
+        # check if random platform is in the required range
         while condition:
             new_width = random.randint(100, 200)
             new_height = random.randint(30, 60)
@@ -91,6 +92,7 @@ class Game():
             if GAMEX_L <= new_x - new_width/2 and new_x + new_width/2 <= GAMEX_R:
                 condition = False
 
+        # adding platfrom that meets requirement to the real platforms
         self.midplatform[0] = new_x
         self.midplatform[1] = new_y
         self.midplatform[2] = new_width
@@ -99,15 +101,6 @@ class Game():
 
 
     def display(self):
-        '''
-        0. game over display
-        1. display the background
-        2. display side boundry
-        3. display platform (call .display())
-        4. display life left
-        5. display king (call .display())
-        6. display the game time
-        '''
 
         # 0. if the game is over
         if not self.king.alive:
@@ -135,14 +128,6 @@ class Game():
             # create second image if not exist
             if not self.y_position[1]:
                 self.y_position[1] = -1 * (self.bg_imgs[second_bg_num].height)
-                # self.realplatforms = []
-                # self.midplatform = [RESX/2, RESY/2, 150, 50]
-                # last = self.realplatforms[-1]
-
-                # # creates list of platforms unitl it reaches the top of the new image
-                # for single_platform in self.realplatforms:
-                #     if single_platform.y >= self.y_position[1] - 1000:
-                #         self.create_one_real_platform()
             image(self.bg_imgs[second_bg_num], 0, self.y_position[1], RESX, self.bg_imgs[second_bg_num].height)
             self.y_position[1] += self.speed * 0.5
 
@@ -160,11 +145,10 @@ class Game():
             single_platform.y += self.speed
             single_platform.display()
 
-        # 7. display the magma
-        # self.magma_height += self.magma_speed
+        # 4. display the magma
         image(self.magma_img, 0, RESY - MAGMA_H, RESX, self.magma_img.height)
 
-        # 2. displaying side boundries
+        # 5. displaying side boundries
         bottom = 0
         while bottom < RESY:
             img = loadImage(PATH + "/images/sidebrick0.png")
@@ -174,7 +158,7 @@ class Game():
                   GAMEX_L * img.height / img.width)
             bottom += GAMEX_L * img.height / img.width
 
-        # 4. display life left
+        # 6. display life left
         yposition = GAMEX_L * 0.5
         for life in range(self.king.life):
             heart = loadImage(PATH + "/images/heart.png")
@@ -182,7 +166,7 @@ class Game():
                   GAMEX_L * 0.6)
             yposition += GAMEX_L
 
-        # 5. display the king
+        # 7. display the king
         self.king.y_position += self.speed
         self.king.ground += self.speed
         self.king.display(self.realplatforms)
@@ -193,7 +177,7 @@ class Game():
         else:
             self.speed = self.speedstore
 
-        # 6. display the game timer
+        # 8. display the game timer
         time_passed = int(floor(time.time() - self.time))
         self.score = time_passed + self.king.score
         minutes = '0' + str(time_passed // 60)
