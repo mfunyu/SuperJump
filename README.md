@@ -1,23 +1,26 @@
-# SuperJump
+![logo](https://user-images.githubusercontent.com/60470877/101980401-58633100-3ca8-11eb-89e7-489b30a20216.png)
+
+<img width="1030" alt="Screen Shot 2020-12-12 at 18 30 28" src="https://user-images.githubusercontent.com/60470877/101980373-2baf1980-3ca8-11eb-9311-3d1b1193fd66.png">
+
 
 ## How to Play 
 
-### Game Control
-+ <- : left
-+ -> : right
+### 🎮 Game Control
++ ⬅️ : left
++ ➡️ : right
 + SPACE BAR press : charging for jump
 + SPACE BAR release : start jump
 
-### Life
-+ blue platforms : life +1
-+ monsters : life -1
+### 🤍 Life
++ blue platforms : 🤍 +1
++ monsters : 🤍 -1
 
 ### Score
-+ normal platforms : +10
-+ blue platforms : +20
-+ magma platforms : -20
-+ new background : +100
-+ bottom magma : -50
+➕ normal platforms : +10  
+➕ blue platforms : +20  
+➕ new background : +100  
+➖ magma platforms : -20  
+➖ bottom magma : -50  
 
 ## Deatails
 
