@@ -26,6 +26,7 @@ class Platform():
 
         self.frame = 0
         self.mark = mark
+        self.text_display = ""
 
     def display(self): #syntax: image(img, x, y, width, height, x1, y1, x2, y2)
         imageMode(CENTER)
@@ -38,4 +39,7 @@ class Platform():
         else:
             image(self.img0, self.x, self.y, self.w, self.h)
         imageMode(CORNER)
-
+        
+        self.text_display = self.text_display[:-1]
+        if len(self.text_display) >= 3:
+            text(self.text_display, self.x, self.y)

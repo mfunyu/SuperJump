@@ -126,9 +126,10 @@ class Game():
             # increasing the game speed when new bg
             self.speed += 1
             self.speedstore += 1
+            self.king.score += 100
         image(self.bg_imgs[self.bg_num], 0, self.y_position[0], RESX, self.bg_imgs[self.bg_num].height)
 
-        # when start displaying clouds (2 images are displayed)
+        # when start displaying next image (2 images are displayed)
         if -5 <= self.y_position[0] < RESY:
             second_bg_num = min([self.bg_num + 1, NUM_BG_IMGS - 1])
             # create second image if not exist

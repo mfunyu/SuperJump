@@ -110,17 +110,25 @@ class King():
     def update(self, platforms):
 
         self.onPlatform = self.check_onPlatform()
-
-        if self.platform_now.mark == 1:
-            if self.check_onPlatform():
+        
+        if self.onPlatform:
+            # add life and score when landing on a good platform
+            if self.platform_now.mark == 1:
                 self.platform_now.mark = 0
                 self.life += 1
-                self.score += 10
-        elif self.platform_now.mark == 2: #platform is bad
-            if self.check_onPlatform():
+                self.score += 20
+                self.platform_now.text_display = "+20   " 
+            # reduce life and score when landing on a bad platform
+            elif self.platform_now.mark == 2: #platform is bad
                 self.platform_now.mark = 0
                 self.life -= 1
                 self.score -= 10
+                self.platform_now.text_display = "-10   "       
+            # add score when landing on a normal platform
+            elif self.platform_now.mark != 0:
+                self.platform_now.mark = 0
+                self.score += 10
+                self.platform_now.text_display = "+10   "
 
 
         # condition lose life
