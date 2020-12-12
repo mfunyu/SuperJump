@@ -31,14 +31,23 @@ def startup(displaytext):
     image(loadImage(PATH + "/images/background.png"), 0, 0, width, height)
     imageMode(CENTER)
     logo = loadImage(PATH + "/images/logo.png")
-    image(logo, width / 2, height * 1 / 3,
+    image(logo, width / 2, height * 1 / 5,
           width * 5 / 6, (width * 5 / 6) * logo.height / logo.width)
     imageMode(CORNER)
     fill(255)
     textAlign(CENTER)
     font = createFont("3270SemiNarrow", floor(RESX * 0.03))
     textFont(font)
-    text(displaytext, width / 2, height * 3 / 4)
+    text("How to Play", width * 1 / 2, height * 2 / 5)
+    text("""<- : left
+-> : right
+SPACE BAR : jump
+    """, width * 1 / 4, height * 1 / 2)
+    text("""Blue platforms : life + 1
+Monsters : life - 1
+(press: charging, release: start jump)
+""", width * 2 / 3, height * 1 / 2)
+    text(displaytext, width / 2, height * 4 / 5)
     img = loadImage(PATH + "/images/king0.png")
     image(img, KING_SIZE, RESY - KING_SIZE * 1.5, KING_SIZE * 1.5,
         KING_SIZE * 1.5, 0, 0, img.width, img.height)
@@ -97,11 +106,11 @@ def keyReleased():
 
 def mousePressed():
     '''
-    Mute / Unmute or 
+    Mute / Unmute or
     Start / Restart game
     '''
     global game, bg_musics, speaker, load_status
-    
+
     # mute or unmute the music
     if ( 0 <= mouseX <= 100
         and RESY - 100 <= mouseY <= RESY):
@@ -112,15 +121,15 @@ def mousePressed():
             else:
                 bg_musics[music].mute()
                 speaker = mute
-    
+
     # restart the game
     elif load_status == LOADED and not game.king.alive:
         load_status = NOT_STARTED
         game = ""
-    
+
     # star the game
     elif load_status == LOADED and not game.play:
         game.play = True
         game.time = time.time()
 
-        
+
