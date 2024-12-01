@@ -1,5 +1,6 @@
-*.class
-*.properties
-*.autosave
-*.DS_Store
-*/imagesold*
+*
+!*/
+!*/*
+!*.py
+!*.png
+!*.mp3

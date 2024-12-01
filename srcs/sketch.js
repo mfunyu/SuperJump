@@ -1,21 +1,27 @@
-let img;
-let RESX = 800;
-let RESY = RESX * 2/3;
+// images
+let PATH = "../assets/images/"
+let imgBackground;
+let speakerMuteImg;
+let speakerUnmuteImg;
+let speakerStatusImg;
 
 function preload() {
-  imgBackground = loadImage("images/background.png");
+  imgBackground = loadImage(PATH + "background.png");
+  speakerUnmuteImg = loadImage(PATH + "speaker_unmute.png")
+  speakerMuteImg = loadImage(PATH + "speaker_mute.png")
+  speakerStatusImg = speakerUnmuteImg
   // let loadStatus = NOT_STARTED;
 }
 
 function setup() {
-    createCanvas(RESX, RESY);
-    background(0);
+    createCanvas(windowWidth, windowHeight);
+    // background(0);
 }
 
 function draw() {
     background(0); // Clear the canvas
     // if (loadStatus === NOT_STARTED) {
-    startupScreen("Loading ... ");
+        startupScreen("Loading ... ");
     //     loadStatus = LOADING;
     // } else if (loadStatus === LOADING && !game) {
     //     game = new Game(bgMusics);
@@ -27,24 +33,24 @@ function draw() {
     // } else if (game) {
     //     game.gameover();
     // }
-    image(speakerImg, 10, RESY - 100, 80, 80); // Display speaker icon
+    image(speakerStatusImg, 20, windowHeight - 100, 80, 80); // Display speaker icon
 }
 
 function startupScreen(displayText) {
     // Display the startup screen
     image(imgBackground, 0, 0, width, height);
-    imageMode(CENTER);
 
     fill(255);
+
     textAlign(CENTER);
-    textSize(RESX * 0.03);
+    textSize(windowHeight * 0.03);
     textFont("3270SemiNarrow");
     text("How to Play", width / 2, height * 2 / 5);
     text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
     text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
     text(displayText, width / 2, height * 4 / 5);
 }
-
+/*
 function keyPressed() {
     // Handle key presses
     if (game && game.king) {
@@ -86,3 +92,4 @@ function mousePressed() {
         game.time = millis();
     }
 }
+    */
