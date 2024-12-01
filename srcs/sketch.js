@@ -1,5 +1,5 @@
 // images
-let PATH = "../assets/images/"
+let IMG_PATH = "../assets/images/"
 let imgBackground;
 let speakerMuteImg;
 let speakerUnmuteImg;
@@ -7,16 +7,21 @@ let speakerStatusImg;
 let logoImg;
 let kingLoadimg;
 
+let SOUND_PATH = "../assets/sounds/"
+let bgMusics = {};
 
 
 function preload() {
-  imgBackground = loadImage(PATH + "background.png");
-  speakerUnmuteImg = loadImage(PATH + "speaker_unmute.png")
-  speakerMuteImg = loadImage(PATH + "speaker_mute.png")
-  speakerStatusImg = speakerUnmuteImg
+  imgBackground = loadImage(IMG_PATH + "background.png");
+  speakerUnmuteImg = loadImage(IMG_PATH + "speaker_unmute.png")
+  speakerMuteImg = loadImage(IMG_PATH + "speaker_mute.png")
+  speakerStatusImg = speakerMuteImg
 
-  logoImg = loadImage(PATH + "logo.png");
-  kingLoadimg = loadImage(PATH + "king_loading.png");
+  logoImg = loadImage(IMG_PATH + "logo.png");
+  kingLoadimg = loadImage(IMG_PATH + "king_loading.png");
+
+  // sounds
+  bgMusics["bg_music"] = loadSound(SOUND_PATH + "bg_music.mp3");
 }
 
 function setup() {
@@ -81,28 +86,29 @@ function keyReleased() {
         if (key === ' ') game.king.keyHandler['jump'] = false;
     }
 }
+*/
 
 function mousePressed() {
     // Mute/unmute or start/restart game
-    if (mouseX >= 0 && mouseX <= 100 && mouseY >= RESY - 100 && mouseY <= RESY) {
+    if (mouseX >= 0 && mouseX <= 100 && mouseY >= windowHeight - 100 && mouseY <= windowHeight) {
         // Toggle mute
         for (let music in bgMusics) {
-            if (bgMusics[music].isPlaying()) {
-                bgMusics[music].stop();
-                speakerImg = muteImg;
-            } else {
+            if (!bgMusics[music].isPlaying()) {
                 bgMusics[music].play();
-                speakerImg = unmuteImg;
+                speakerStatusImg = speakerUnmuteImg;
+            } else {
+                bgMusics[music].pause();
+                speakerStatusImg = speakerMuteImg;
             }
         }
-    } else if (loadStatus === LOADED && !game.king.alive) {
-        // Restart game
-        loadStatus = NOT_STARTED;
-        game = null;
-    } else if (loadStatus === LOADED && !game.play) {
-        // Start game
-        game.play = true;
-        game.time = millis();
     }
+    // } else if (loadStatus === LOADED && !game.king.alive) {
+    //     // Restart game
+    //     loadStatus = NOT_STARTED;
+    //     game = null;
+    // } else if (loadStatus === LOADED && !game.play) {
+    //     // Start game
+    //     game.play = true;
+    //     game.time = millis();
+    // }
 }
-    */
