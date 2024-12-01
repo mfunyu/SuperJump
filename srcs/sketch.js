@@ -4,23 +4,29 @@ let imgBackground;
 let speakerMuteImg;
 let speakerUnmuteImg;
 let speakerStatusImg;
+let logoImg;
+let kingLoadimg;
+
+
 
 function preload() {
   imgBackground = loadImage(PATH + "background.png");
   speakerUnmuteImg = loadImage(PATH + "speaker_unmute.png")
   speakerMuteImg = loadImage(PATH + "speaker_mute.png")
   speakerStatusImg = speakerUnmuteImg
-  // let loadStatus = NOT_STARTED;
+
+  logoImg = loadImage(PATH + "logo.png");
+  kingLoadimg = loadImage(PATH + "king_loading.png");
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    // background(0);
+  createCanvas(windowWidth, windowHeight);
+  // background(0);
 }
 
 function draw() {
-    background(0); // Clear the canvas
-    // if (loadStatus === NOT_STARTED) {
+  background(0); // Clear the canvas
+  // if (loadStatus === NOT_STARTED) {
         startupScreen("Loading ... ");
     //     loadStatus = LOADING;
     // } else if (loadStatus === LOADING && !game) {
@@ -37,18 +43,25 @@ function draw() {
 }
 
 function startupScreen(displayText) {
-    // Display the startup screen
-    image(imgBackground, 0, 0, width, height);
+  image(imgBackground, 0, 0, width, height);
+  imageMode(CENTER);
 
-    fill(255);
+  fill(255);
+  image(logoImg, width / 2, height * 1 / 5,
+    width * 5 / 6, (width * 5 / 6) * logoImg.height / logoImg.width)
+  imageMode(CENTER);
 
-    textAlign(CENTER);
-    textSize(windowHeight * 0.03);
-    textFont("3270SemiNarrow");
-    text("How to Play", width / 2, height * 2 / 5);
-    text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
-    text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
-    text(displayText, width / 2, height * 4 / 5);
+  textAlign(CENTER);
+  textSize(windowHeight * 0.03);
+  textFont("3270SemiNarrow");
+  text("How to Play", width / 2, height * 2 / 5);
+  text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
+  text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
+  text(displayText, width / 2, height * 4 / 5);
+
+  let KING_SIZE = windowHeight / 5;
+  image(kingLoadimg, KING_SIZE, windowHeight - KING_SIZE, KING_SIZE, KING_SIZE);
+  imageMode(CORNER);
 }
 /*
 function keyPressed() {
