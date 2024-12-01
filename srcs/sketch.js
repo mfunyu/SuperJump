@@ -25,7 +25,7 @@ function preload() {
   speakerStatusImg = speakerMuteImg
 
   logoImg = loadImage(IMG_PATH + "logo.png");
-  kingLoadimg = loadImage(IMG_PATH + "king_loading.png");
+  kingLoadimg = loadImage(IMG_PATH + "king0.png");
 
   // sounds
   bgMusics["bg_music"] = loadSound(SOUND_PATH + "bg_music.mp3");
