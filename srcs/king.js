@@ -64,13 +64,13 @@ class King {
     }
     }
     // If none, the bottom is the ground
-    this.ground = RESY - MAGMA_H;
+    this.ground = windowHeight - MAGMA_H;
   }
 
   reborn(platforms) {
     // Reborn to the lowest platform after touching the magma
     for (let platform of platforms) {
-    if (platform.y > 5 && platform.y <= RESY && platform.mark !== 1 && platform.mark !== 2) {
+    if (platform.y > 5 && platform.y <= windowHeight && platform.mark !== 1 && platform.mark !== 2) {
       this.x_position = platform.x;
       this.y_position = platform.y - platform.h / 2 - this.radius;
       this.platform_now = platform;
@@ -121,7 +121,7 @@ class King {
     this.platform_now.text_display = "+10";
     }
 
-    if (this.y_position + this.radius > RESY - MAGMA_H) {
+    if (this.y_position + this.radius > windowHeight - MAGMA_H) {
     this.isFalling = false;
     this.life -= 1;
     this.bg_musics["lose_life"].play();
