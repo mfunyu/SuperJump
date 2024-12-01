@@ -10,6 +10,13 @@ let kingLoadimg;
 let SOUND_PATH = "../assets/sounds/"
 let bgMusics = {};
 
+const Status = {
+  NOT_STARTED: 0,
+  LOADING: 1,
+  WAITING: 2,
+  STARTED: 3
+}
+let phase = Status.NOT_STARTED;
 
 function preload() {
   imgBackground = loadImage(IMG_PATH + "background.png");
@@ -22,6 +29,10 @@ function preload() {
 
   // sounds
   bgMusics["bg_music"] = loadSound(SOUND_PATH + "bg_music.mp3");
+  bgMusics["game_end"] = loadSound(SOUND_PATH + "game_end.mp3");
+  bgMusics["jump"] = loadSound(SOUND_PATH + "jump.mp3");
+  bgMusics["lose_life"] = loadSound(SOUND_PATH + "lose_life.mp3");
+  bgMusics["jump_premotion"] = loadSound(SOUND_PATH + "jump_premotion.mp3");
 }
 
 function setup() {
@@ -30,21 +41,30 @@ function setup() {
 }
 
 function draw() {
-  background(0); // Clear the canvas
-  // if (loadStatus === NOT_STARTED) {
-        startupScreen("Loading ... ");
-    //     loadStatus = LOADING;
-    // } else if (loadStatus === LOADING && !game) {
-    //     game = new Game(bgMusics);
-    // } else if (game && game.play) {
-    //     game.display();
-    // } else if (game && game.king.alive) {
-    //     startupScreen("Click Anywhere to Start");
-    //     loadStatus = LOADED;
-    // } else if (game) {
-    //     game.gameover();
-    // }
-    image(speakerStatusImg, 20, windowHeight - 100, 80, 80); // Display speaker icon
+  background(0);
+  switch (phase) {
+    case Status.NOT_STARTED:
+      startupScreen("Loading ... ");
+      phase = Status.LOADING;
+      break;
+    case Status.LOADING:
+      game = new Game(bgMusics);
+      phase = Status.WAITING;
+      break;
+    case Status.WAITING:
+      startupScreen("Click Anywhere to Start");
+      break;
+    case Status.STARTED:
+      if (!game)
+        break;
+      if (game.play) {
+        game.display();
+      } else {
+        game.gameOver();
+      }
+    }
+
+    image(speakerStatusImg, 20, windowHeight - 100, 80, 80);
 }
 
 function startupScreen(displayText) {
@@ -91,24 +111,24 @@ function keyReleased() {
 function mousePressed() {
     // Mute/unmute or start/restart game
     if (mouseX >= 0 && mouseX <= 100 && mouseY >= windowHeight - 100 && mouseY <= windowHeight) {
-        // Toggle mute
-        for (let music in bgMusics) {
-            if (!bgMusics[music].isPlaying()) {
-                bgMusics[music].play();
-                speakerStatusImg = speakerUnmuteImg;
-            } else {
-                bgMusics[music].pause();
-                speakerStatusImg = speakerMuteImg;
-            }
+      // Toggle mute
+      for (let music in bgMusics) {
+        if (!bgMusics[music].isPlaying()) {
+          bgMusics[music].play();
+          speakerStatusImg = speakerUnmuteImg;
+        } else {
+          bgMusics[music].pause();
+          speakerStatusImg = speakerMuteImg;
         }
+      }
+    } else if (phase === Status.WAITING) {
+      phase = Status.STARTED;
+      console.log("Game start");
+      game.play = true;
+    } else if (phase === Status.STARTED) {
+      if (!game?.king?.alive) {
+        phase = Status.NOT_STARTED;
+        game = null;
+      }
     }
-    // } else if (loadStatus === LOADED && !game.king.alive) {
-    //     // Restart game
-    //     loadStatus = NOT_STARTED;
-    //     game = null;
-    // } else if (loadStatus === LOADED && !game.play) {
-    //     // Start game
-    //     game.play = true;
-    //     game.time = millis();
-    // }
 }
