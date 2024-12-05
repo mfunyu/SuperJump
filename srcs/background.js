@@ -15,20 +15,22 @@ class Background {
   }
 
   display() {
-
     while (this.total_img_height < this.altitude) {
       this.image_index++;
       this.total_img_height += this.images[this.image_index].height;
     }
 
-    let visible_img_size = this.total_img_height - this.altitude;
-    let y_coordinate = windowHeight - visible_img_size;
-    image(this.images[this.image_index], 0, y_coordinate, windowWidth, this.images[this.image_index].height);
+    let visible_img_size = 0;
+    for (let i = 0; windowHeight > visible_img_size; i++) {
+      let image_index = Math.min(this.image_index + i, this.images.length - 1);
+      let current_img = this.images[image_index];
 
-    for (let i = 1; windowHeight > visible_img_size; i++) {
-      let current_img = this.images[this.image_index + i];
-      visible_img_size += current_img.height;
-      y_coordinate = windowHeight - visible_img_size
+      if (i == 0)
+        visible_img_size = this.total_img_height - this.altitude;
+      else
+        visible_img_size += current_img.height;
+
+      let y_coordinate = windowHeight - visible_img_size
       image(current_img, 0, y_coordinate, windowWidth, current_img.height);
     }
     this.scroll();
