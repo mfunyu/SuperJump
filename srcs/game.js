@@ -4,7 +4,6 @@ const GAME_SPEED = 3
 const HORIZONTAL_MAX = 200
 const JUMP_HIGHET = 20
 
-const NUM_BG_IMGS = 5
 const NUM_IMG_DIV = 1
 const NUM_PHASE = 1
 
@@ -39,22 +38,15 @@ class Game {
     this.gameEnd = bgMusics['game_end'];
     this.bgMusic.loop();
 
-    // Background image management
-    this.bgNum = 0;
-    this.bgImgs = [];
-    this.yPosition = [0, 0];
-    for (let i = 0; i < NUM_BG_IMGS; i++) {
-      this.bgImgs.push(loadImage(`${IMG_PATH}/bg${i}.png`));
-    }
-    this.yPosition[0] = -(this.bgImgs[0].height - windowHeight);
+    this.background = new Background();
 
     // Platforms
     this.realPlatforms = [];
     this.midPlatform = [windowWidth / 2, windowHeight / 2, 150, 50];
     this.realPlatforms.push(new Platform(this.midPlatform[0], this.midPlatform[1], this.midPlatform[2], this.midPlatform[3], 0));
-    while (this.realPlatforms[this.realPlatforms.length - 1]?.y >= -(this.bgImgs[0].height - windowHeight) - 10000) {
-      this.createOneRealPlatform();
-    }
+    // while (this.realPlatforms[this.realPlatforms.length - 1]?.y >= -(this.bgImgs[0].height - windowHeight) - 10000) {
+    //   this.createOneRealPlatform();
+    // }
 
     // King
     this.king = new King(windowWidth / 2, this.realPlatforms[0].y - this.realPlatforms[0].h / 2 - KING_SIZE / 2, 3, 12, this.realPlatforms[0], bgMusics);
@@ -119,26 +111,7 @@ class Game {
       return;
     }
 
-    // Background scrolling
-    this.yPosition[0] += this.speed * 0.5;
-    if (this.yPosition[0] > windowHeight) {
-      this.yPosition[0] = this.yPosition[1];
-      this.yPosition[1] = 0;
-      this.bgNum = min(this.bgNum + 1, NUM_BG_IMGS - 1);
-      this.speed++;
-      this.speedStore++;
-      this.king.score += 100;
-    }
-    image(this.bgImgs[this.bgNum], 0, this.yPosition[0], windowWidth, this.bgImgs[this.bgNum].height);
-
-    if (-5 <= this.yPosition[0] && this.yPosition[0] < windowHeight) {
-      let secondBgNum = min(this.bgNum + 1, NUM_BG_IMGS - 1);
-      if (!this.yPosition[1]) {
-        this.yPosition[1] = -this.bgImgs[secondBgNum].height;
-      }
-      image(this.bgImgs[secondBgNum], 0, this.yPosition[1], windowWidth, this.bgImgs[secondBgNum].height);
-      this.yPosition[1] += this.speed * 0.5;
-    }
+    this.background.display();
 
     // Clouds
     if (this.bgNum > 1) {

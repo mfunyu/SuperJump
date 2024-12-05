@@ -33,6 +33,8 @@ function preload() {
   bgMusics["jump"] = loadSound(SOUND_PATH + "jump.mp3");
   bgMusics["lose_life"] = loadSound(SOUND_PATH + "lose_life.mp3");
   bgMusics["jump_premotion"] = loadSound(SOUND_PATH + "jump_premotion.mp3");
+
+  Background.preload();
 }
 
 function setup() {
@@ -64,7 +66,7 @@ function draw() {
       }
     }
 
-    image(speakerStatusImg, 20, windowHeight - 100, 80, 80);
+  image(speakerStatusImg, 20, windowHeight - 100, 80, 80);
 }
 
 function startupScreen(displayText) {
@@ -73,7 +75,7 @@ function startupScreen(displayText) {
 
   fill(255);
   image(logoImg, width / 2, height * 1 / 5,
-    width * 5 / 6, (width * 5 / 6) * logoImg.height / logoImg.width)
+  width * 5 / 6, (width * 5 / 6) * logoImg.height / logoImg.width)
   imageMode(CENTER);
 
   textAlign(CENTER);
@@ -88,49 +90,50 @@ function startupScreen(displayText) {
   image(kingLoadimg, KING_SIZE, windowHeight - KING_SIZE, KING_SIZE, KING_SIZE);
   imageMode(CORNER);
 }
+
 /*
 function keyPressed() {
-    // Handle key presses
-    if (game && game.king) {
-        if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = true;
-        if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = true;
-        if (key === ' ') game.king.keyHandler['jump'] = true;
-    }
+  // Handle key presses
+  if (game && game.king) {
+    if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = true;
+    if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = true;
+    if (key === ' ') game.king.keyHandler['jump'] = true;
+  }
 }
 
 function keyReleased() {
-    // Handle key releases
-    if (game && game.king) {
-        if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = false;
-        if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = false;
-        if (key === ' ') game.king.keyHandler['jump'] = false;
-    }
+  // Handle key releases
+  if (game && game.king) {
+    if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = false;
+    if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = false;
+    if (key === ' ') game.king.keyHandler['jump'] = false;
+  }
 }
 */
 
 function mousePressed() {
-    // Mute/unmute or start/restart game
-    if (mouseX >= 0 && mouseX <= 100 && mouseY >= windowHeight - 100 && mouseY <= windowHeight) {
-      // Toggle mute
-      for (let music in bgMusics) {
-        if (!bgMusics[music].isPlaying()) {
-          bgMusics[music].play();
-          speakerStatusImg = speakerUnmuteImg;
-        } else {
-          bgMusics[music].pause();
-          speakerStatusImg = speakerMuteImg;
-        }
-      }
-    } else if (phase === Status.WAITING) {
-      phase = Status.STARTED;
-      console.log("Game start");
-      game.play = true;
-    } else if (phase === Status.STARTED) {
-      if (!game?.king?.alive) {
-        phase = Status.NOT_STARTED;
-        game = null;
-      }
+  // Mute/unmute or start/restart game
+  if (mouseX >= 0 && mouseX <= 100 && mouseY >= windowHeight - 100 && mouseY <= windowHeight) {
+    // Toggle mute
+    for (let music in bgMusics) {
+    if (!bgMusics[music].isPlaying()) {
+      bgMusics[music].play();
+      speakerStatusImg = speakerUnmuteImg;
+    } else {
+      bgMusics[music].pause();
+      speakerStatusImg = speakerMuteImg;
     }
+    }
+  } else if (phase === Status.WAITING) {
+    phase = Status.STARTED;
+    console.log("Game start");
+    game.play = true;
+  } else if (phase === Status.STARTED) {
+    if (!game?.king?.alive) {
+    phase = Status.NOT_STARTED;
+    game = null;
+    }
+  }
 }
 
 function windowResized() {
