@@ -19,7 +19,7 @@ class Background {
 
   display() {
     while (this.total_img_height < this.altitude) {
-      this.image_index++;
+      this.image_index = Math.min(this.image_index + 1, Background.NUM_BG_IMGS);
       this.total_img_height += Background.images[this.image_index].height;
     }
 
