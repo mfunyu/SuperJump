@@ -35,6 +35,7 @@ function preload() {
   bgMusics["jump_premotion"] = loadSound(SOUND_PATH + "jump_premotion.mp3");
 
   Background.preload();
+  Platform.preload();
 }
 
 function setup() {

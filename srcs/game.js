@@ -1,8 +1,6 @@
 
 
 const GAME_SPEED = 3
-const HORIZONTAL_MAX = 200
-const JUMP_HIGHET = 20
 
 const NUM_IMG_DIV = 1
 const NUM_PHASE = 1
@@ -41,15 +39,17 @@ class Game {
     this.background = new Background();
 
     // Platforms
-    this.realPlatforms = [];
-    this.midPlatform = [windowWidth / 2, windowHeight / 2, 150, 50];
-    this.realPlatforms.push(new Platform(this.midPlatform[0], this.midPlatform[1], this.midPlatform[2], this.midPlatform[3], 0));
-    // while (this.realPlatforms[this.realPlatforms.length - 1]?.y >= -(this.bgImgs[0].height - windowHeight) - 10000) {
-    //   this.createOneRealPlatform();
-    // }
+    this.platform = new Platform(windowWidth / 2, windowHeight / 2, 150, 50, Platform.platformType.NORMAL);
+    this.platforms = [this.platform];
+
+    let previousPlatform = this.platform;
+    while (previousPlatform.y >= -windowHeight - 10000) {
+      previousPlatform = Platform.createNewPlatform(previousPlatform, this.speed);
+      this.platforms.push(previousPlatform);
+    }
 
     // King
-    this.king = new King(windowWidth / 2, this.realPlatforms[0].y - this.realPlatforms[0].h / 2 - KING_SIZE / 2, 3, 12, this.realPlatforms[0], bgMusics);
+    this.king = new King(windowWidth / 2, this.platform.y - this.platform.h / 2 - KING_SIZE / 2, 3, 12, this.platform, bgMusics);
 
     // Magma
     this.magmaImg = loadImage(IMG_PATH + "magma.png");
@@ -81,29 +81,6 @@ class Game {
     image(img, KING_SIZE, windowHeight - KING_SIZE * 1.5, KING_SIZE * 1.5, KING_SIZE * 1.5);
   }
 
-  createOneRealPlatform() {
-    let condition = true;
-    let newX, newY, newWidth, newHeight;
-
-    // Generate platform within constraints
-    while (condition) {
-      newWidth = random(100, 200);
-      newHeight = random(30, 60);
-      let newXPositive = this.midPlatform[0] + this.midPlatform[2] + random(0.3 * Math.tanh(this.speed) * HORIZONTAL_MAX, 0.6 * Math.tanh(this.speed) * HORIZONTAL_MAX);
-      let newXNegative = this.midPlatform[0] - random(0.3 * Math.tanh(this.speed) * HORIZONTAL_MAX, 0.6 * Math.tanh(this.speed) * HORIZONTAL_MAX) - newWidth;
-      newX = random([newXPositive, newXNegative]);
-      newY = this.midPlatform[1] - random(2 * Math.tanh(this.speed) * JUMP_HIGHET, 3 * Math.tanh(this.speed) * JUMP_HIGHET) - newHeight;
-
-      if (GAMEX_L <= newX - newWidth / 2 && newX + newWidth / 2 <= GAMEX_R) {
-        condition = false;
-      }
-    }
-
-    // Add platform
-    this.midPlatform = [newX, newY, newWidth, newHeight];
-    this.realPlatforms.push(new Platform(newX, newY, newWidth, newHeight, int(random(1, 7))));
-  }
-
   display() {
     // Check if the game is over
     if (!this.king.alive) {
@@ -122,7 +99,7 @@ class Game {
     }
 
     // Platforms
-    for (let platform of this.realPlatforms) {
+    for (let platform of this.platforms) {
       platform.y += this.speed;
       platform.display();
     }
@@ -150,7 +127,7 @@ class Game {
     // King
     this.king.yPosition += this.speed;
     this.king.ground += this.speed;
-    this.king.display(this.realPlatforms);
+    this.king.display(this.platforms);
 
     if (this.king.yPosition - this.king.radius < 20) {
       this.speed += 6;
