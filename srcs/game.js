@@ -51,12 +51,13 @@ class Game {
     // King
     this.king = new King(windowWidth / 2, this.platform.y - this.platform.h / 2 - KING_SIZE / 2, 3, 12, this.platform, bgMusics);
 
-    // Magma
-    this.magmaImg = loadImage(IMG_PATH + "magma.png");
-
     // Clouds
     this.cloudX = 0;
     this.cloudY = 0;
+
+    this.magma = new StaticObjects(StaticObjects.objectType.MAGMA, 0.02);
+    this.sideBricks = new StaticObjects(StaticObjects.objectType.BRICKS, 0.05);
+    this.lifes = new StaticObjects(StaticObjects.objectType.LIFE, 0.05, 0.4);
   }
 
   gameOver() {
@@ -104,25 +105,9 @@ class Game {
       platform.display();
     }
 
-    // Magma
-    image(this.magmaImg, 0, windowHeight - MAGMA_H, windowWidth, this.magmaImg.height);
-
-    // Side boundaries
-    let bottom = 0;
-    while (bottom < windowHeight) {
-      let img = loadImage(IMG_PATH + "sidebrick0.png");
-      image(img, 0, bottom, GAMEX_L, GAMEX_L * img.height / img.width);
-      image(img, GAMEX_R, bottom, GAMEX_L, GAMEX_L * img.height / img.width);
-      bottom += GAMEX_L * img.height / img.width;
-    }
-
-    // Life display
-    let yPosition = GAMEX_L * 0.5;
-    for (let i = 0; i < this.king.life; i++) {
-      let heart = loadImage(IMG_PATH + "heart.png");
-      image(heart, GAMEX_R + (GAMEX_L * 0.2), yPosition, GAMEX_L * 0.6, GAMEX_L * 0.6);
-      yPosition += GAMEX_L;
-    }
+    this.magma.display();
+    this.sideBricks.display();
+    this.lifes.display(this.king.life);
 
     // King
     this.king.yPosition += this.speed;

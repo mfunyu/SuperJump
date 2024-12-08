@@ -36,6 +36,7 @@ function preload() {
 
   Background.preload();
   Platform.preload();
+  StaticObjects.preload();
 }
 
 function setup() {
