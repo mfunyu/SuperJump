@@ -25,7 +25,7 @@ function preload() {
   speakerStatusImg = speakerMuteImg
 
   logoImg = loadImage(IMG_PATH + "logo.png");
-  kingLoadimg = loadImage(IMG_PATH + "king0.png");
+  kingLoadimg = loadImage(IMG_PATH + "king_normal.png");
 
   // sounds
   bgMusics["bg_music"] = loadSound(SOUND_PATH + "bg_music.mp3");
@@ -34,6 +34,7 @@ function preload() {
   bgMusics["lose_life"] = loadSound(SOUND_PATH + "lose_life.mp3");
   bgMusics["jump_premotion"] = loadSound(SOUND_PATH + "jump_premotion.mp3");
 
+  King.preload();
   Background.preload();
   Platform.preload();
   StaticObjects.preload();
@@ -93,25 +94,13 @@ function startupScreen(displayText) {
   imageMode(CORNER);
 }
 
-/*
 function keyPressed() {
-  // Handle key presses
-  if (game && game.king) {
-    if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = true;
-    if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = true;
-    if (key === ' ') game.king.keyHandler['jump'] = true;
-  }
+  game?.king?.handlingKeyEvent(keyCode);
 }
 
 function keyReleased() {
-  // Handle key releases
-  if (game && game.king) {
-    if (keyCode === LEFT_ARROW) game.king.keyHandler['left'] = false;
-    if (keyCode === RIGHT_ARROW) game.king.keyHandler['right'] = false;
-    if (key === ' ') game.king.keyHandler['jump'] = false;
-  }
+  game?.king?.handlingKeyEvent(keyCode);
 }
-*/
 
 function mousePressed() {
   // Mute/unmute or start/restart game

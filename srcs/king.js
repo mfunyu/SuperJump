@@ -1,41 +1,77 @@
 class King {
-  loadImages() {
-    this.rightMove_img = loadImage(IMG_PATH + "king1.png");
-    this.leftMove_img = loadImage(IMG_PATH + "king0.png");
-    this.jump_img = loadImage(IMG_PATH + "king8.png");
-    this.charging_img = loadImage(IMG_PATH + "king7.png");
-    this.normal_img = loadImage(IMG_PATH + "king0.png");
+  static normalRightImg;
+  static normalLeftImg;
+  static moveRightImgs = [];
+  static moveLeftImgs = [];
+  static chargeImg;
+  static jumpImg;
+
+  static directoionType = {
+    NORMAL: "normal",
+    RIGHT: "right",
+    LEFT: "left",
+    CHARGE: "charge"
+  };
+
+  static preload() {
+    for (let i = 0; i < 3; i++) {
+      this.moveRightImgs.push(loadImage(IMG_PATH + `king_right${i}.png`));
+      this.moveLeftImgs.push(loadImage(IMG_PATH + `king_left${i}.png`));
+    }
+    this.normalRightImg = loadImage(IMG_PATH + "king_normal.png");
+    this.normalLeftImg = loadImage(IMG_PATH + "king_left.png");
+    this.chargeImg = loadImage(IMG_PATH + "king_charge.png");
+    this.jumpImg = loadImage(IMG_PATH + "king_jump.png");
   }
 
-  constructor(x_position, y_position, life, speed, realplatform, bg_musics) {
+  constructor(life, speed, platform, bg_musics) {
     this.alive = true;
 
-    this.x_position = x_position;
-    this.y_position = y_position;
     this.life = life;
     this.bg_musics = bg_musics;
     this.radius = KING_SIZE / 2;
-    this.ground = this.y_position + this.radius;
-    this.platform_now = realplatform;
+
+    this.platform_now = platform;
+    this.calCoords(platform);
     this.speed = speed;
     this.y_speed = 0;
     this.jump_start = 0;
     this.height = 0;
     this.score = 0;
 
-    this.rightImgCounter = 0;
-    this.leftImgCounter = 3;
-    this.jumpImgCounter_right = 8;
-    this.jumpImgCounter_left = 16;
-    this.loadImages();
-    this.img = this.normal_img;
+    // image
+    this.imgCounter = {
+      "type": King.directoionType.NORMAL,
+      "count": 0
+    };
+    this.normalImg = King.normalRightImg;
+    this.img = this.normalImg;
 
-    this.key_handler = { jump: false, right: false, left: false };
 
+    // this.jumpImgCounter_right = 8;
+    // this.jumpImgCounter_left = 16;
+
+    this.keyHandler = {
+      [King.directoionType.CHARGE]: false,
+      [King.directoionType.RIGHT]: false,
+      [King.directoionType.LEFT]: false
+    };
+
+    // States
+    this.movingRight = false;
+    this.movingLeft = false;
+    this.isCharging = false;
     this.isJumping = false;
     this.isFalling = false;
-    this.fallImgCounter_right = 9;
-    this.fallImgCounter_left = 17;
+
+    // this.fallImgCounter_right = 9;
+    // this.fallImgCounter_left = 17;
+  }
+
+  calCoords(platform) {
+    this.x_position = platform.x;
+    this.ground = platform.y - platform.h / 2;
+    this.y_position = this.ground - this.radius;
   }
 
   calDistance(target) {
@@ -79,29 +115,72 @@ class King {
     }
   }
 
-  check_onPlatform() {
-    if (this.y_position + this.radius < this.ground) return false;
+  isOnPlatform() {
+    if (this.y_position + this.radius < this.ground)
+      return false;
 
-    if (
-    this.x_position + this.radius / 2 <
+    if (this.x_position + this.radius / 2 <
       this.platform_now.x - this.platform_now.w / 2 ||
     this.x_position - this.radius / 2 >
       this.platform_now.x + this.platform_now.w / 2
     ) {
-    if (!this.isJumping) {
-      this.isFalling = true;
-      fallstartFrame = frameCount;
+      return false;
     }
-    return false;
-    }
-
-    this.isFalling = false;
     return true;
   }
 
-  update(platforms) {
-    this.onPlatform = this.check_onPlatform();
+  handlingKeyEvent(keyCode) {
+    if (keyCode === 32) {
+      this.isCharging = !this.isCharging;
+      if (!this.isCharging) {
+        this.isJumping = true;
+      }
+    } if (keyCode === RIGHT_ARROW) {
+      this.movingRight = !this.movingRight;
+    } if (keyCode === LEFT_ARROW) {
+      this.movingLeft = !this.movingLeft;
+    }
+  }
 
+  chooseImage() {
+    if (this.movingRight) {
+      if (this.imgCounter.type !== King.directoionType.RIGHT) {
+        this.imgCounter.count = 0;
+      }
+      this.img = King.moveRightImgs[this.imgCounter.count++]
+      this.imgCounter.type = King.directoionType.RIGHT;
+      this.imgCounter.count %= 3;
+    } else if (this.movingLeft) {
+      if (this.imgCounter.type !== King.directoionType.LEFT) {
+        this.imgCounter.count = 0;
+      }
+      this.img = King.moveLeftImgs[this.imgCounter.count++]
+      this.imgCounter.type = King.directoionType.LEFT;
+      this.imgCounter.count %= 3;
+    } else {
+      if (this.isCharging)
+        this.img = King.chargeImg;
+      else {
+        if (this.imgCounter.type === King.directoionType.LEFT)
+          this.normalImg = King.normalLeftImg;
+        else if (this.imgCounter.type === King.directoionType.RIGHT)
+          this.normalImg = King.normalRightImg;
+        this.img = this.normalImg;
+      }
+      this.imgCounter.type = King.directoionType.NORMAL;
+    }
+  }
+
+  update(platforms) {
+    this.onPlatform = this.isOnPlatform();
+    if (this.onPlatform) {
+      this.isFalling = false;
+      this.isJumping = false;
+    } else {
+      if (!this.isJumping)
+        this.isFalling = true;
+    }
+    /*
     if (this.platform_now.mark === 1 && this.onPlatform) {
     this.platform_now.mark = 0;
     this.life += 1;
@@ -128,45 +207,28 @@ class King {
     this.score -= 50;
     this.reborn(platforms);
     }
+    */
 
-    if (this.life <= 0) this.alive = false;
+    // if (this.life <= 0) this.alive = false;
 
-    if (this.isJumping) this.key_handler["jump"] = false;
-
-    if (this.key_handler["right"] && !this.key_handler["jump"]) {
-    this.rightImgCounter++;
-    this.rightMove_img = loadImage(
-      PATH + "/images/king" + this.rightImgCounter + ".png"
-    );
-    if (!this.isFalling && !this.isJumping) this.img = this.rightMove_img;
-    if (this.rightImgCounter === 3 || !this.key_handler["right"])
-      this.rightImgCounter = 0;
-
-    this.x_position += this.speed;
-    } else if (this.key_handler["left"] && !this.key_handler["jump"]) {
-    this.leftImgCounter++;
-    this.leftMove_img = loadImage(
-      PATH + "/images/king" + this.leftImgCounter + ".png"
-    );
-    if (!this.isFalling && !this.isJumping) this.img = this.leftMove_img;
-    if (this.leftImgCounter === 6 || !this.key_handler["left"])
-      this.leftImgCounter = 3;
-
-    this.x_position -= this.speed;
-    } else if (this.key_handler["jump"] && this.onPlatform) {
-    this.img = this.charging_img;
-    } else {
-    this.img = this.normal_img;
+    if (!(this.isJumping || this.isCharging || this.isFalling)) {
+      if (this.movingRight) {
+        this.x_position += this.speed;
+      } else if (this.movingLeft) {
+        this.x_position -= this.speed;
+      }
     }
 
-    if (!this.onPlatform) this.groundUpdate(platforms);
-    if (this.isFalling) this.fall();
+    // if (!this.onPlatform) this.groundUpdate(platforms);
+    // if (this.isFalling) this.fall();
   }
 
   display(platforms) {
     this.update(platforms);
+    this.chooseImage();
     imageMode(CENTER);
     image(this.img, this.x_position, this.y_position, this.radius * 2, this.radius * 2);
+
     imageMode(CORNER);
   }
 
@@ -195,7 +257,7 @@ class King {
     this.jump_start = 0;
     } else if (this.onPlatform || this.isJumping) {
     if (!this.jump_start) {
-      this.bg_musics["jump"].play();
+      this.bg_musics["charge"].play();
       this.jump_start = this.ground;
     }
     this.isJumping = true;

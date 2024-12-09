@@ -110,7 +110,7 @@ class Game {
     this.lifes.display(this.king.life);
 
     // King
-    this.king.yPosition += this.speed;
+    this.king.y_position += this.speed;
     this.king.ground += this.speed;
     this.king.display(this.platforms);
 
