@@ -174,6 +174,9 @@ class King {
   update(platforms) {
     this.onPlatform = this.isOnPlatform();
     if (this.onPlatform) {
+      if (this.y_position + this.radius > this.ground)
+        this.y_position = this.radius + this.ground;
+      this.y_speed = 0;
       this.isFalling = false;
       this.isJumping = false;
     } else {
@@ -211,7 +214,11 @@ class King {
 
     // if (this.life <= 0) this.alive = false;
 
-    if (!(this.isJumping || this.isCharging || this.isFalling)) {
+    if (this.isFalling) {
+      this.y_speed += 1;
+      this.y_position += this.y_speed;
+    }
+    else if (!(this.isJumping || this.isCharging)) {
       if (this.movingRight) {
         this.x_position += this.speed;
       } else if (this.movingLeft) {
@@ -230,17 +237,6 @@ class King {
     image(this.img, this.x_position, this.y_position, this.radius * 2, this.radius * 2);
 
     imageMode(CORNER);
-  }
-
-  fall() {
-    this.y_speed += 2;
-    this.y_position += this.y_speed;
-
-    if (this.y_position + this.radius > this.ground) {
-    this.y_position = this.ground - this.radius;
-    this.isFalling = false;
-    this.y_speed = 0;
-    }
   }
 
   jump() {
