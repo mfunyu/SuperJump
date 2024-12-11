@@ -49,7 +49,7 @@ class Game {
     }
 
     // King
-    this.king = new King(windowWidth / 2, this.platform.y - this.platform.h / 2 - KING_SIZE / 2, 3, 12, this.platform, bgMusics);
+    this.king = new King(3, 12, this.platform, bgMusics);
 
     // Clouds
     this.cloudX = 0;
