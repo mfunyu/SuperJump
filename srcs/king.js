@@ -1,3 +1,5 @@
+const MaxJumpHeight = 200;
+
 class King {
   static normalRightImg;
   static normalLeftImg;
@@ -35,8 +37,8 @@ class King {
     this.calCoords(platform);
     this.speed = speed;
     this.y_speed = 0;
-    this.jump_start = 0;
-    this.height = 0;
+    this.jumpStartedPosition = 0;
+    this.jumpHeight = 0;
     this.score = 0;
 
     // image
@@ -64,6 +66,7 @@ class King {
     this.isJumping = false;
     this.isFalling = false;
 
+    this.jumpFrameCounter = 1;
     // this.fallImgCounter_right = 9;
     // this.fallImgCounter_left = 17;
   }
@@ -136,9 +139,11 @@ class King {
         this.isJumping = true;
       }
     } if (keyCode === RIGHT_ARROW) {
-      this.movingRight = !this.movingRight;
+      if (!this.isFalling)
+        this.movingRight = !this.movingRight;
     } if (keyCode === LEFT_ARROW) {
-      this.movingLeft = !this.movingLeft;
+      if (!this.isFalling)
+        this.movingLeft = !this.movingLeft;
     }
   }
 
@@ -172,17 +177,6 @@ class King {
   }
 
   update(platforms) {
-    this.onPlatform = this.isOnPlatform();
-    if (this.onPlatform) {
-      if (this.y_position + this.radius > this.ground)
-        this.y_position = this.radius + this.ground;
-      this.y_speed = 0;
-      this.isFalling = false;
-      this.isJumping = false;
-    } else {
-      if (!this.isJumping)
-        this.isFalling = true;
-    }
     /*
     if (this.platform_now.mark === 1 && this.onPlatform) {
     this.platform_now.mark = 0;
@@ -217,8 +211,11 @@ class King {
     if (this.isFalling) {
       this.y_speed += 1;
       this.y_position += this.y_speed;
-    }
-    else if (!(this.isJumping || this.isCharging)) {
+    } else if (this.isJumping) {
+      this.jump();
+    } else if (this.isCharging) {
+      this.charge();
+    } else {
       if (this.movingRight) {
         this.x_position += this.speed;
       } else if (this.movingLeft) {
@@ -226,8 +223,17 @@ class King {
       }
     }
 
+    this.onPlatform = this.isOnPlatform();
+    if (this.onPlatform) {
+      if (this.y_position + this.radius > this.ground)
+        this.y_position = this.ground - this.radius;
+      this.y_speed = 0;
+      this.isFalling = false;
+    } else {
+      if (!this.isJumping)
+        this.isFalling = true;
+    }
     // if (!this.onPlatform) this.groundUpdate(platforms);
-    // if (this.isFalling) this.fall();
   }
 
   display(platforms) {
@@ -239,30 +245,30 @@ class King {
     imageMode(CORNER);
   }
 
+  charge() {
+    if (this.jumpHeight < MaxJumpHeight)
+      this.jumpHeight += 30
+  }
+
   jump() {
     let radPerFrame = (2 * Math.PI) / frameRate();
-    this.y_speed = -this.height * cos(radPerFrame * counter);
+    this.y_speed = -this.jumpHeight * cos(radPerFrame * this.jumpFrameCounter);
 
-    if (this.y_speed > 0 && this.isJumping) {
-    this.isFalling = true;
-    fallstartFrame = frameCount;
-    this.isJumping = false;
-    counter = 1;
-    this.y_speed = 0;
-    this.height = 0;
-    this.jump_start = 0;
-    } else if (this.onPlatform || this.isJumping) {
-    if (!this.jump_start) {
-      this.bg_musics["charge"].play();
-      this.jump_start = this.ground;
-    }
-    this.isJumping = true;
-    this.y_position = -this.height * sin(radPerFrame * counter) + this.jump_start;
-    counter++;
+    if (this.y_speed > 0) {
+      this.isJumping = false;
+      this.y_speed = 0;
+      this.jumpHeight = 0;
+      this.jumpStartedPosition = 0;
+      this.jumpFrameCounter = 1;
+
+      this.isFalling = true;
+      return;
     }
 
-    if (this.y_position + this.radius > this.ground) {
-    this.y_position = this.ground - this.radius;
+    if (!this.jumpStartedPosition) {
+      this.jumpStartedPosition = this.ground;
     }
+    this.y_position = -this.jumpHeight * sin(radPerFrame * this.jumpFrameCounter) + this.jumpStartedPosition;
+    this.jumpFrameCounter++;
   }
-  }
+}
