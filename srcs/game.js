@@ -39,7 +39,7 @@ class Game {
     this.background = new Background();
 
     // Platforms
-    this.platform = new Platform(windowWidth / 2, windowHeight / 2, 150, 50, Platform.platformType.NORMAL);
+    this.platform = new Platform(windowWidth / 2, windowHeight / 2, 150, 50, Platform.platformType.REACHED);
     this.platforms = [this.platform];
 
     let previousPlatform = this.platform;

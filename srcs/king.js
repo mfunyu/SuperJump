@@ -231,6 +231,7 @@ class King {
         this.y_position = this.ground - this.radius;
       this.y_speed = 0;
       this.isFalling = false;
+      this.addLandingScore();
     } else {
       if (!this.isJumping)
         this.isFalling = true;
@@ -251,6 +252,23 @@ class King {
       rect(this.x_position - this.radius, this.y_position - this.radius * 1.3, fillingWidth, this.radius * 0.08);
 
       noFill();
+    }
+  }
+
+  addLandingScore() {
+    if (this.platform_now.platformType === Platform.platformType.GOOD) {
+      this.life += 1;
+      this.score += 20;
+      this.platform_now.displayScore = 10;
+    }
+    else if (this.platform_now.platformType === Platform.platformType.BAD) {
+      this.life -= 1;
+      this.score -= 10;
+      this.platform_now.displayScore = 10;
+    }
+    else if (this.platform_now.platformType === Platform.platformType.NORMAL) {
+      this.score += 10;
+      this.platform_now.displayScore = 10;
     }
   }
 

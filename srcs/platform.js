@@ -12,6 +12,7 @@ class Platform {
   static platformMagmaImg;
 
   static platformType = {
+    REACHED: "reached",
     NORMAL: "normal",
     GOOD: "good",
     BAD: "bad"
@@ -26,6 +27,12 @@ class Platform {
   }
 
   static platformOptions = [];
+
+  static platformPoints = {
+    [this.platformType.NORMAL]: "+10",
+    [this.platformType.GOOD]: "+20",
+    [this.platformType.BAD]: "-10"
+  }
 
   static {
     this.platformOptions = [];
@@ -72,8 +79,9 @@ class Platform {
     // this.img3 = loadImage(IMG_PATH + "monster4.png");
     // }
 
+    this.isReached = false;
     this.platformType = this.choosePlatformType(platformType);
-    this.text_display = "";
+    this.scoreText = Platform.platformPoints[this.platformType];
   }
 
   choosePlatformType(platformType) {
@@ -85,9 +93,8 @@ class Platform {
 
   display() {
     imageMode(CENTER);
-    console.log("Platform.platformImages[this.platformType]: ", Platform.platformImages[this.platformType]);
-    console.log(Platform.platformImages);
-    image(Platform.platformImages[this.platformType], this.x, this.y, this.w, this.h);
+    let img = Platform.platformImages[this.platformType] || Platform.platformNormalImg;
+    image(img, this.x, this.y, this.w, this.h);
 
     // // Display platform image based on its type
     // if (this.mark === 1) {
@@ -107,11 +114,11 @@ class Platform {
 
     imageMode(CORNER);
 
-    // Display score text
-    if (this.text_display.length >= 3) {
-      this.text_display = this.text_display.slice(0, -1); // Remove last character
+    if (this.displayScore) {
       textAlign(CENTER);
-      text(this.text_display, this.x, this.y);
+      text(this.scoreText, this.x, this.y);
+      this.displayScore--;
+      this.platformType = Platform.platformType.REACHED;
     }
   }
 
