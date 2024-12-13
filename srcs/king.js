@@ -33,7 +33,6 @@ class King {
     this.bg_musics = bg_musics;
     this.radius = KING_SIZE / 2;
 
-    this.platform_now = platform;
     this.calCoords(platform);
     this.speed = speed;
     this.y_speed = 0;
@@ -75,6 +74,7 @@ class King {
     this.x_position = platform.x;
     this.ground = platform.y - platform.h / 2;
     this.y_position = this.ground - this.radius;
+    this.platform_now = platform;
   }
 
   calDistance(target) {
@@ -115,14 +115,17 @@ class King {
   }
 
   reborn(platforms) {
-    // Reborn to the lowest platform after touching the magma
+    this.score -= 50;
+    this.life -= 1;
+    this.isFalling = false;
+
     for (let platform of platforms) {
-    if (platform.y > 5 && platform.y <= windowHeight && platform.mark !== 1 && platform.mark !== 2) {
-      this.x_position = platform.x;
-      this.y_position = platform.y - platform.h / 2 - this.radius;
-      this.platform_now = platform;
-      return;
-    }
+      if (10 < platform.y && platform.y <= windowHeight
+          && (platform.platformType === Platform.platformType.NORMAL
+             || platform.platformType === Platform.platformType.REACHED)) {
+        this.calCoords(platform)
+        return;
+      }
     }
   }
 
@@ -178,38 +181,7 @@ class King {
     }
   }
 
-  update(platforms) {
-    /*
-    if (this.platform_now.mark === 1 && this.onPlatform) {
-    this.platform_now.mark = 0;
-    this.life += 1;
-    this.score += 20;
-    this.platform_now.text_display = "+20";
-    } else if (this.platform_now.mark === 2) {
-    if (this.calDistance(this.platform_now) <= this.radius * 2) {
-      this.bg_musics["lose_life"].play();
-      this.platform_now.mark = 0;
-      this.life -= 1;
-      this.score -= 20;
-      this.platform_now.text_display = "-20";
-    }
-    } else if (this.platform_now.mark !== 0 && this.onPlatform) {
-    this.platform_now.mark = 0;
-    this.score += 10;
-    this.platform_now.text_display = "+10";
-    }
-
-    if (this.y_position + this.radius > windowHeight - MAGMA_H) {
-    this.isFalling = false;
-    this.life -= 1;
-    this.bg_musics["lose_life"].play();
-    this.score -= 50;
-    this.reborn(platforms);
-    }
-    */
-
-    // if (this.life <= 0) this.alive = false;
-
+  move() {
     if (this.isFalling) {
       this.y_speed += 1;
       this.y_position += this.y_speed;
@@ -224,9 +196,14 @@ class King {
         this.x_position -= this.speed;
       }
     }
+  }
 
-    this.onPlatform = this.isOnPlatform();
-    if (this.onPlatform) {
+  update(platforms) {
+    this.move();
+
+    if (this.y_position > windowHeight) {
+      this.reborn(platforms);
+    } else if (this.isOnPlatform()) {
       if (!this.isAbove(this.ground))
         this.y_position = this.ground - this.radius;
       this.y_speed = 0;
