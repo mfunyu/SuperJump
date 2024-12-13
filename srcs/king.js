@@ -1,4 +1,4 @@
-const MaxJumpHeight = 200;
+const MaxJumpHeight = 500;
 
 class King {
   static normalRightImg;
@@ -88,22 +88,30 @@ class King {
     );
   }
 
+  isInRange(target) {
+    let leftSide = this.x_position - this.radius / 2;
+    let rightSide = this.x_position + this.radius / 2;
+    if (leftSide <= target.x + target.w / 2
+        && target.x - target.w / 2 <= rightSide)
+      return true;
+    return false;
+  }
+
+  isAbove(targetTop) {
+    let footPosition = this.y_position + this.radius;
+    return footPosition < targetTop;
+  }
+
   groundUpdate(platforms) {
-    // Finding a ground to land on
-    for (let i = platforms.length - 1; i >= 0; i--) {
-    let p = platforms[i];
-    if (
-      this.y_position + this.radius <= p.y - p.h / 2 &&
-      this.x_position >= p.x - p.w / 2 - this.radius &&
-      this.x_position <= p.x + p.w / 2 + this.radius
-    ) {
-      this.ground = p.y - p.h / 2;
-      this.platform_now = p;
-      return;
+    this.ground = windowHeight;
+    for (let platform of platforms) {
+      console.log(this.ground, platform.y)
+      let platformTop = platform.y - platform.h / 2;
+      if (this.isAbove(platformTop) && this.isInRange(platform)) {
+        this.ground = platformTop;
+        this.platform_now = platform;
+      }
     }
-    }
-    // If none, the bottom is the ground
-    this.ground = windowHeight - MAGMA_H;
   }
 
   reborn(platforms) {
@@ -119,16 +127,12 @@ class King {
   }
 
   isOnPlatform() {
-    if (this.y_position + this.radius < this.ground)
+    if (this.isAbove(this.ground))
       return false;
 
-    if (this.x_position + this.radius / 2 <
-      this.platform_now.x - this.platform_now.w / 2 ||
-    this.x_position - this.radius / 2 >
-      this.platform_now.x + this.platform_now.w / 2
-    ) {
+    if (!this.isInRange(this.platform_now))
       return false;
-    }
+
     return true;
   }
 
@@ -139,11 +143,9 @@ class King {
         this.isJumping = true;
       }
     } if (keyCode === RIGHT_ARROW) {
-      if (!this.isFalling)
-        this.movingRight = !this.movingRight;
+      this.movingRight = !this.movingRight;
     } if (keyCode === LEFT_ARROW) {
-      if (!this.isFalling)
-        this.movingLeft = !this.movingLeft;
+      this.movingLeft = !this.movingLeft;
     }
   }
 
@@ -225,15 +227,15 @@ class King {
 
     this.onPlatform = this.isOnPlatform();
     if (this.onPlatform) {
-      if (this.y_position + this.radius > this.ground)
+      if (!this.isAbove(this.ground))
         this.y_position = this.ground - this.radius;
       this.y_speed = 0;
       this.isFalling = false;
     } else {
       if (!this.isJumping)
         this.isFalling = true;
+      this.groundUpdate(platforms);
     }
-    // if (!this.onPlatform) this.groundUpdate(platforms);
   }
 
   displayEffects() {
@@ -250,7 +252,6 @@ class King {
 
       noFill();
     }
-
   }
 
   display(platforms) {
