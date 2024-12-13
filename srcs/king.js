@@ -236,6 +236,23 @@ class King {
     // if (!this.onPlatform) this.groundUpdate(platforms);
   }
 
+  displayEffects() {
+    if (this.isCharging) {
+      fill(150);
+      stroke(150);
+      let chargeBarWidth = this.radius * 1.8;
+      rect(this.x_position - this.radius, this.y_position - this.radius * 1.3, chargeBarWidth, this.radius * 0.08);
+
+      fill(255);
+      stroke(255);
+      let fillingWidth = (this.jumpHeight / MaxJumpHeight) * chargeBarWidth;
+      rect(this.x_position - this.radius, this.y_position - this.radius * 1.3, fillingWidth, this.radius * 0.08);
+
+      noFill();
+    }
+
+  }
+
   display(platforms) {
     this.update(platforms);
     this.chooseImage();
@@ -243,6 +260,7 @@ class King {
     image(this.img, this.x_position, this.y_position, this.radius * 2, this.radius * 2);
 
     imageMode(CORNER);
+    this.displayEffects();
   }
 
   charge() {
