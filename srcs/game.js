@@ -60,30 +60,7 @@ class Game {
     this.lifes = new StaticObjects(StaticObjects.objectType.LIFE, 0.05, 0.4);
   }
 
-  gameOver() {
-    // Stop music and play game end sound
-    Object.values(this.bgMusics).forEach(music => music.stop());
-    this.gameEnd.play();
-
-    // Display game over screen
-    image(loadImage(IMG_PATH + "background.png"), 0, 0, width, height);
-    imageMode(CENTER);
-    let logo = loadImage(IMG_PATH + "gameover.png");
-    image(logo, width / 2, height / 5, width * 5 / 6, (width * 5 / 6) * logo.height / logo.width);
-    imageMode(CORNER);
-    fill(255);
-    textAlign(CENTER);
-    textSize(windowWidth * 0.04);
-    text("Your Score", width / 2, height * 2 / 5);
-    textSize(windowWidth * 0.03);
-    text(this.score, width / 2, height * 3 / 5);
-    text("Click Anywhere to Restart", width / 2, height * 4 / 5);
-    let img = loadImage(IMG_PATH + "king10.png");
-    image(img, KING_SIZE, windowHeight - KING_SIZE * 1.5, KING_SIZE * 1.5, KING_SIZE * 1.5);
-  }
-
   display() {
-    // Check if the game is over
     if (!this.king.alive) {
       this.play = false;
       return;
@@ -105,10 +82,6 @@ class Game {
       platform.display();
     }
 
-    this.magma.display();
-    this.sideBricks.display();
-    this.lifes.display(this.king.life);
-
     // King
     this.king.y_position += this.speed;
     this.king.ground += this.speed;
@@ -119,6 +92,10 @@ class Game {
     } else {
       this.speed = this.speedStore;
     }
+
+    this.magma.display();
+    this.sideBricks.display();
+    this.lifes.display(this.king.life);
 
     // Timer and score
     let timePassed = int((millis() - this.startTime) / 1000);

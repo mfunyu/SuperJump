@@ -5,7 +5,7 @@ let speakerMuteImg;
 let speakerUnmuteImg;
 let speakerStatusImg;
 let logoImg;
-let kingLoadimg;
+let kingLoadImg;
 
 let SOUND_PATH = "../assets/sounds/"
 let bgMusics = {};
@@ -25,7 +25,9 @@ function preload() {
   speakerStatusImg = speakerMuteImg
 
   logoImg = loadImage(IMG_PATH + "logo.png");
-  kingLoadimg = loadImage(IMG_PATH + "king_normal.png");
+  gameOverImg = loadImage(IMG_PATH + "gameover.png");
+  kingLoadImg = loadImage(IMG_PATH + "king_normal.png");
+  kingDeadImg = loadImage(IMG_PATH + "king_dead.png");
 
   // sounds
   bgMusics["bg_music"] = loadSound(SOUND_PATH + "bg_music.mp3");
@@ -65,33 +67,50 @@ function draw() {
       if (game.play) {
         game.display();
       } else {
-        game.gameOver();
+        gameOverScreen(game.score);
       }
     }
 
   image(speakerStatusImg, 20, windowHeight - 100, 80, 80);
 }
 
-function startupScreen(displayText) {
-  image(imgBackground, 0, 0, width, height);
+function displayScreen(background, logo, title, king, displayText) {
+  imageMode(CORNER);
+  image(background, 0, 0, width, height);
+
   imageMode(CENTER);
+  image(logo, width / 2, height * 1 / 5, width * 5 / 6, (width * 5 / 6) * logo.height / logo.width)
 
   fill(255);
-  image(logoImg, width / 2, height * 1 / 5,
-  width * 5 / 6, (width * 5 / 6) * logoImg.height / logoImg.width)
-  imageMode(CENTER);
-
   textAlign(CENTER);
-  textSize(windowHeight * 0.03);
   textFont("3270SemiNarrow");
-  text("How to Play", width / 2, height * 2 / 5);
-  text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
-  text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
+
+  //title
+  text(title, width / 2, height * 2 / 5);
   text(displayText, width / 2, height * 4 / 5);
 
-  let KING_SIZE = windowHeight / 5;
-  image(kingLoadimg, KING_SIZE, windowHeight - KING_SIZE, KING_SIZE, KING_SIZE);
-  imageMode(CORNER);
+  let KING_SIZE = windowHeight / 6;
+  imageMode(CENTER);
+  image(king,  KING_SIZE, windowHeight - KING_SIZE, KING_SIZE, KING_SIZE);
+}
+
+function startupScreen(displayText) {
+  textSize(windowWidth * 0.02);
+  let title = "How to Play"
+  displayScreen(imgBackground, logoImg, title, kingLoadImg, displayText);
+
+  text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
+  text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
+}
+
+function gameOverScreen(score) {
+  // Stop music and play game end sound
+  // Object.values(this.bgMusics).forEach(music => music.stop());
+  // this.gameEnd.play();
+  let displayText = "Click Anywhere to Restart";
+  displayScreen(imgBackground, gameOverImg, "Game Over", kingDeadImg, displayText)
+
+  text(score, width / 2, height * 3 / 5);
 }
 
 function keyPressed() {

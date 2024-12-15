@@ -105,7 +105,6 @@ class King {
   groundUpdate(platforms) {
     this.ground = windowHeight;
     for (let platform of platforms) {
-      console.log(this.ground, platform.y)
       let platformTop = platform.y - platform.h / 2;
       if (this.isAbove(platformTop) && this.isInRange(platform)) {
         this.ground = platformTop;
@@ -214,6 +213,10 @@ class King {
         this.isFalling = true;
       this.groundUpdate(platforms);
     }
+
+    if (this.life <= 0) {
+      this.alive = false;
+    }
   }
 
   displayEffects() {
@@ -251,6 +254,9 @@ class King {
 
   display(platforms) {
     this.update(platforms);
+    if (!this.alive)
+      return;
+
     this.chooseImage();
     imageMode(CENTER);
     image(this.img, this.x_position, this.y_position, this.radius * 2, this.radius * 2);
