@@ -10,13 +10,7 @@ let kingLoadImg;
 let SOUND_PATH = "../assets/sounds/"
 let bgMusics = {};
 
-const Status = {
-  NOT_STARTED: 0,
-  LOADING: 1,
-  WAITING: 2,
-  STARTED: 3
-}
-let phase = Status.NOT_STARTED;
+let gameStarted = false;
 
 function preload() {
   imgBackground = loadImage(IMG_PATH + "background.png");
@@ -49,27 +43,18 @@ function setup() {
 
 function draw() {
   background(0);
-  switch (phase) {
-    case Status.NOT_STARTED:
-      startupScreen("Loading ... ");
-      phase = Status.LOADING;
-      break;
-    case Status.LOADING:
-      game = new Game(bgMusics);
-      phase = Status.WAITING;
-      break;
-    case Status.WAITING:
-      startupScreen("Click Anywhere to Start");
-      break;
-    case Status.STARTED:
-      if (!game)
-        break;
-      if (game.play) {
-        game.display();
-      } else {
-        gameOverScreen(game.score);
-      }
+
+  if (!gameStarted) {
+    showStartScreen();
+    game = new Game(bgMusics);
+    console.log("game", game);
+  } else {
+    if (game?.play) {
+      game.display();
+    } else {
+      showGameOverScreen(game.score);
     }
+  }
 
   image(speakerStatusImg, 20, windowHeight - 100, 80, 80);
 }
@@ -94,16 +79,19 @@ function displayScreen(background, logo, title, king, displayText) {
   image(king,  KING_SIZE, windowHeight - KING_SIZE, KING_SIZE, KING_SIZE);
 }
 
-function startupScreen(displayText) {
+function showStartScreen() {
   textSize(windowWidth * 0.02);
   let title = "How to Play"
+  let displayText = "Click Anywhere to Start";
   displayScreen(imgBackground, logoImg, title, kingLoadImg, displayText);
 
   text("<- : left\n-> : right\nSPACE BAR : jump", width * 1 / 4, height / 2);
   text("Blue platforms: life + 1\nMonsters: life - 1\n(press: charging, release: start jump)", width * 2 / 3, height / 2);
+
+  noLoop();
 }
 
-function gameOverScreen(score) {
+function showGameOverScreen(score) {
   // Stop music and play game end sound
   // Object.values(this.bgMusics).forEach(music => music.stop());
   // this.gameEnd.play();
@@ -111,6 +99,7 @@ function gameOverScreen(score) {
   displayScreen(imgBackground, gameOverImg, "Game Over", kingDeadImg, displayText)
 
   text(score, width / 2, height * 3 / 5);
+  noLoop();
 }
 
 function keyPressed() {
@@ -134,14 +123,15 @@ function mousePressed() {
       speakerStatusImg = speakerMuteImg;
     }
     }
-  } else if (phase === Status.WAITING) {
-    phase = Status.STARTED;
-    console.log("Game start");
-    game.play = true;
-  } else if (phase === Status.STARTED) {
-    if (!game?.king?.alive) {
-    phase = Status.NOT_STARTED;
-    game = null;
+  } else {
+    if (!gameStarted) {
+      console.log("Game start");
+      gameStarted = true;
+      game.play = true;
+      loop();
+    } else if (!game?.play) {
+      gameStarted = false;
+      loop();
     }
   }
 }
